@@ -398,19 +398,23 @@ function lobbyMsg(m,err=false){
 document.getElementById('btn-create').addEventListener('click',async()=>{
   const nick=document.getElementById('inp-nick').value.trim();
   if(!nick){lobbyMsg('닉네임을 입력하세요',true);return;}
-  S.nick=nick;
-  S.isHost=true;
-  S.playerId=genId();
-  S.roomCode=genCode();
-
-  await set(ref(db,`rooms/${S.roomCode}`),{
-    host: S.playerId,
-    status: 'waiting',
-    roles: S.roles,
-    players:{ [S.playerId]:{ nick, host:true, ready:false, alive:true, order:Date.now() } }
-  });
-
-  enterWaitRoom();
+  lobbyMsg('방 생성 중...');
+  try{
+    S.nick=nick;
+    S.isHost=true;
+    S.playerId=genId();
+    S.roomCode=genCode();
+    await set(ref(db,`rooms/${S.roomCode}`),{
+      host: S.playerId,
+      status: 'waiting',
+      roles: S.roles,
+      players:{ [S.playerId]:{ nick, host:true, ready:false, alive:true, order:Date.now() } }
+    });
+    enterWaitRoom();
+  }catch(e){
+    lobbyMsg('오류: '+e.message,true);
+    console.error(e);
+  }
 });
 
 document.getElementById('btn-join').addEventListener('click',async()=>{
