@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🌙 마피아 게임</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+:root{
+  --bg:#0a0a14;--surface:#12121f;--surface2:#1a1a2e;--surface3:#0f1526;
+  --accent:#e94560;--accent2:#9b59b6;--text:#e8e8f0;--dim:#6b6b8a;
+  --success:#27ae60;--warn:#e67e22;--border:#1e1e35;
+  --mafia:#e94560;--police:#3498db;--doctor:#27ae60;--citizen:#7f8c8d;
+  --night:#9b59b6;--day:#e67e22;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:hidden}
+.screen{display:none;flex-direction:column;min-height:100vh;max-width:480px;margin:0 auto;padding:16px}
+.screen.active{display:flex}
+
+/* TYPOGRAPHY */
+h1{font-size:30px;font-weight:900;letter-spacing:3px;color:var(--accent)}
+.dim{color:var(--dim);font-size:13px}
+.card-title{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px}
+
+/* HEADER */
+.hdr{text-align:center;padding:28px 0 22px}
+.hdr-moon{font-size:48px;line-height:1;margin-bottom:8px}
+.hdr-sub{color:var(--dim);font-size:13px;margin-top:6px;letter-spacing:.5px}
+
+/* PLAYER COUNT */
+.count-wrap{display:flex;align-items:center;justify-content:center;gap:24px}
+.cnt-btn{width:48px;height:48px;border-radius:50%;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s,transform .1s;flex-shrink:0;line-height:1}
+.cnt-btn:active{background:var(--accent);color:#fff;transform:scale(.88)}
+.cnt-num{font-size:54px;font-weight:900;color:var(--text);min-width:64px;text-align:center;line-height:1}
+
+/* ROLE GRID */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.role-cell{background:var(--surface2);border-radius:14px;padding:14px 12px}
+.role-cell-lbl{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.role-adj{display:flex;align-items:center;justify-content:space-between}
+.adj-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.adj-btn:active{opacity:.5}
+.adj-num{font-size:26px;font-weight:800;min-width:32px;text-align:center}
+
+/* PLAYER LIST */
+.plist{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto}
+.prow{display:flex;align-items:center;gap:10px}
+.prow-lbl{font-size:12px;color:var(--dim);width:28px;flex-shrink:0;text-align:right}
+.pname-inp{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;user-select:text;-webkit-user-select:text}
+.pname-inp:focus{border-color:var(--accent)}
+
+/* BUTTONS */
+.btn{width:100%;padding:17px;border-radius:16px;border:none;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:opacity .15s,transform .15s}
+.btn:active{transform:scale(.96);opacity:.8}
+.btn-red{background:linear-gradient(135deg,#e94560,#c0392b);color:#fff}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-outline{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn-blue{background:linear-gradient(135deg,#2980b9,#1a5276);color:#fff}
+
+/* HOLD BUTTON */
+.hold-btn{width:100%;padding:22px;border-radius:16px;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:16px;font-weight:800;cursor:pointer;text-align:center;letter-spacing:.5px;transition:background .1s,color .1s}
+.hold-btn.on{background:var(--accent);color:#fff}
+.hold-btn-blue{border-color:var(--police);color:var(--police)}
+.hold-btn-blue.on{background:var(--police);color:#fff}
+
+/* REVEAL CARD */
+.reveal-card{min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border-radius:18px;padding:24px;border:2px solid var(--border);transition:border-color .2s;margin-bottom:14px}
+.reveal-role{font-size:40px;font-weight:900;letter-spacing:2px}
+.reveal-desc{font-size:13px;color:var(--dim);text-align:center;line-height:1.7;margin-top:4px}
+
+/* PHASE */
+.phase-bar{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 0 10px}
+.phase-icon{font-size:30px}
+.phase-lbl{font-size:22px;font-weight:900}
+.night-clr{color:var(--night)}
+.day-clr{color:var(--day)}
+
+/* GUIDE BOX */
+.guide{background:var(--surface2);border-radius:14px;padding:18px;margin-bottom:14px;font-size:14px;line-height:1.9;color:var(--dim)}
+.guide strong{color:var(--text);font-weight:700}
+.guide em{color:var(--accent);font-style:normal;font-weight:600}
+
+/* POLICE */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.pbtn{padding:13px 6px;border-radius:12px;border:2px solid var(--police);background:transparent;color:var(--police);font-size:12px;font-weight:700;cursor:pointer;text-align:center;line-height:1.3;transition:background .1s,color .1s;word-break:break-all}
+.pbtn.on{background:var(--police);color:#fff}
+.pbtn.dead{border-color:var(--border);color:var(--dim);opacity:.4;pointer-events:none}
+.p-result{margin-top:10px;padding:16px;border-radius:12px;background:var(--surface);font-size:15px;font-weight:800;text-align:center;min-height:54px;display:flex;align-items:center;justify-content:center;transition:color .1s;color:transparent}
+.p-result.show-m{color:var(--mafia)}
+.p-result.show-c{color:var(--police)}
+
+/* MAFIA REVEAL */
+.m-reveal{margin-top:12px;padding:18px;border-radius:12px;background:var(--surface);font-size:15px;font-weight:800;text-align:center;min-height:54px;display:flex;align-items:center;justify-content:center;color:transparent;transition:color .1s}
+.m-reveal.show{color:var(--mafia)}
+
+/* NIGHT SELECT */
+.nsel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.nsel-btn{padding:14px 6px;border-radius:12px;border:2px solid var(--border);background:transparent;color:var(--dim);font-size:13px;font-weight:700;cursor:pointer;text-align:center;line-height:1.3;transition:all .15s;word-break:break-all}
+.nsel-btn:active{opacity:.7}
+.nsel-btn.sel{color:#fff}
+.nsel-btn:disabled{opacity:.35;cursor:default}
+.night-result-box{padding:16px;border-radius:12px;font-size:14px;font-weight:700;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center;background:var(--surface2);margin:10px 0}
+.confirm-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;transition:opacity .15s}
+.confirm-btn:disabled{opacity:.3;cursor:default}
+
+/* SURVIVOR LIST */
+.sv-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.sv-item:last-child{border-bottom:none}
+.sv-item.dead{opacity:.35}
+.sv-chk{width:24px;height:24px;border-radius:7px;border:2px solid var(--accent);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .1s,border-color .1s;font-size:14px;color:transparent;font-weight:900}
+.sv-chk.on{background:var(--success);border-color:var(--success);color:#fff}
+.sv-name{flex:1;font-size:15px;font-weight:600}
+.sv-num{font-size:12px;color:var(--dim)}
+
+/* TIMER */
+.timer-wrap{display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.t-lbl{font-size:10px;color:var(--dim);margin-bottom:3px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.t-display{font-size:32px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:3px}
+.t-running{color:var(--day)}
+.t-urgent{color:var(--accent);animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.t-btns{display:flex;gap:8px;margin-left:auto;flex-shrink:0}
+.t-btn{padding:9px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer}
+.t-btn:active{opacity:.6}
+.t-start{background:var(--success);color:#fff;border-color:var(--success)}
+.t-stop{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* NAV */
+.nav{display:flex;gap:10px;margin-top:auto;padding-top:16px}
+.nav .btn{flex:1}
+.nav .btn.hidden{visibility:hidden}
+
+/* STATUS */
+.status-wrap{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.spill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+
+/* RESULT */
+.result-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;text-align:center}
+.result-emoji{font-size:90px;line-height:1;margin-bottom:16px}
+.result-title{font-size:38px;font-weight:900;margin-bottom:8px}
+.result-sub{font-size:15px;color:var(--dim);margin-bottom:32px}
+.role-reveal-list{background:var(--surface);border-radius:18px;padding:20px;width:100%;margin-bottom:28px}
+.rr-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.rr-item:last-child{border-bottom:none}
+
+/* SEPARATOR */
+.sep{height:1px;background:var(--border);margin:14px 0}
+
+/* Scroll */
+.scroll{overflow-y:auto;flex:1}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     SCREEN 1: SETUP
+═════════════════════════════════════════════ -->
+<div id="s-setup" class="screen active">
+  <div class="hdr">
+    <div class="hdr-moon">🌙</div>
+    <h1>MAFIA</h1>
+    <div class="hdr-sub">사회자 없는 마피아 게임 · 스마트폰 한 대</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">👥 참가 인원</div>
+    <div class="count-wrap">
+      <button class="cnt-btn" id="btn-minus">−</button>
+      <div class="cnt-num" id="cnt-disp">7</div>
+      <button class="cnt-btn" id="btn-plus">＋</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚖️ 역할 배분</div>
+    <div class="role-grid" id="role-grid"></div>
+    <div class="sep"></div>
+    <div id="role-total-msg" class="dim" style="text-align:center;font-size:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✏️ 플레이어 이름 (터치하여 수정)</div>
+    <div class="plist" id="plist"></div>
+  </div>
+
+  <button class="btn btn-red" id="btn-start" style="margin-top:4px;margin-bottom:32px">
+    🎮 게임 시작
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SCREEN 2: ROLE DISTRIBUTION
+═════════════════════════════════════════════ -->
+<div id="s-role" class="screen">
+  <div style="padding-top:28px;flex:1;display:flex;flex-direction:column">
+    <div style="text-align:center;margin-bottom:18px">
+      <div class="dim" style="margin-bottom:6px">역할 확인 차례</div>
+      <div style="font-size:21px;font-weight:900" id="role-player-lbl"></div>
+      <div class="dim" style="margin-top:8px;font-size:13px">📱 스마트폰을 해당 플레이어에게 건네주세요</div>
+    </div>
+
+    <div class="reveal-card" id="reveal-card">
+      <div style="font-size:50px">🤫</div>
+      <div class="dim" style="text-align:center;font-size:13px;line-height:1.8">
+        아래 버튼을 <strong style="color:var(--text)">꾹 누르는 동안만</strong><br>역할이 표시됩니다
+      </div>
+    </div>
+
+    <button class="hold-btn" id="role-hold-btn" style="margin-bottom:12px">
+      👆 꾹 눌러서 역할 확인
+    </button>
+
+    <button class="btn btn-ghost" id="btn-role-next">
+      ✅ 확인 완료 — 다음으로
+    </button>
+
+    <div style="text-align:center;margin-top:18px;margin-bottom:16px">
+      <div class="dim" id="role-progress-lbl"></div>
+      <div id="role-dots" style="margin-top:8px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SCREEN 3: GAME
+═════════════════════════════════════════════ -->
+<div id="s-game" class="screen">
+  <div class="phase-bar">
+    <span class="phase-icon" id="phase-icon"></span>
+    <span class="phase-lbl" id="phase-lbl"></span>
+  </div>
+
+  <div class="scroll" id="game-scroll">
+    <!-- Night content -->
+    <div id="night-wrap">
+      <div class="guide" id="night-guide"></div>
+      <div id="night-action"></div>
+    </div>
+
+    <!-- Day content -->
+    <div id="day-wrap" style="display:none">
+      <div class="card" id="night-result-card" style="display:none;border-color:var(--accent)"></div>
+      <div class="timer-wrap">
+        <div>
+          <div class="t-lbl">토론 타이머</div>
+          <div class="t-display" id="t-disp">05:00</div>
+        </div>
+        <div class="t-btns">
+          <button class="t-btn t-start" id="t-start-btn" onclick="timerToggle()">시작</button>
+          <button class="t-btn" onclick="timerReset()">리셋</button>
+        </div>
+      </div>
+
+      <div class="guide" id="day-guide"></div>
+
+      <div class="card">
+        <div class="card-title">✅ 생존자 명단 체크</div>
+        <div class="dim" style="font-size:12px;margin-bottom:12px">탈락한 플레이어의 체크를 해제하세요</div>
+        <div id="sv-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-ghost" id="btn-prev" onclick="prevPhase()">◀ 이전</button>
+    <button class="btn btn-red" id="btn-next" onclick="nextPhase()">다음 ▶</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SCREEN 4: RESULT
+═════════════════════════════════════════════ -->
+<div id="s-result" class="screen">
+  <div class="result-wrap">
+    <div class="result-emoji" id="res-emoji"></div>
+    <div class="result-title" id="res-title"></div>
+    <div class="result-sub" id="res-sub"></div>
+    <div class="role-reveal-list" id="res-roles"></div>
+    <button class="btn btn-outline" onclick="resetGame()">🔄 새 게임 시작</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const ROLE_CFG = {
+  마피아: { color:'#e94560', emoji:'🔪', desc:'밤마다 동료 마피아와 함께 시민 1명을 처형하세요.', dotColor:'var(--mafia)' },
+  의사:   { color:'#27ae60', emoji:'💉', desc:'밤마다 1명을 선택해 마피아의 처형에서 구할 수 있습니다. 자신도 가능.',  dotColor:'var(--doctor)' },
+  경찰:   { color:'#3498db', emoji:'🔵', desc:'밤마다 1명을 선택해 마피아 여부를 비밀리에 조사할 수 있습니다.', dotColor:'var(--police)' },
+  시민:   { color:'#7f8c8d', emoji:'👤', desc:'낮에 토론하여 마피아를 찾아내세요. 투표로 처형합니다.', dotColor:'var(--citizen)' },
+};
+
+const ROLE_ORDER = ['마피아','의사','경찰','시민'];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let G = {};
+
+function initState() {
+  G = {
+    count: 7,
+    roles: { 마피아:2, 의사:1, 경찰:1, 시민:3 },
+    names: [],
+    players: [],   // {name, role, alive}
+    roleIdx: 0,
+    phase: 0,
+    nightStep: 0,
+    nightChoices: { mafia:null, doctor:null, police:null },      // 0=night1, 1=day1, 2=night2, ...
+    timer: { sec:300, running:false, iv:null },
+  };
+  G.names = makenames(G.count);
+}
+
+function makenames(n) {
+  const arr = [];
+  for (let i = 0; i < n; i++) arr.push((i+1)+'번 플레이어');
+  return arr;
+}
+
+function calcRoles(n) {
+  const mafia = Math.max(1, Math.floor(n/3));
+  const doctor = n >= 4 ? 1 : 0;
+  const police = n >= 5 ? 1 : 0;
+  const citizen = Math.max(0, n - mafia - doctor - police);
+  return { 마피아:mafia, 의사:doctor, 경찰:police, 시민:citizen };
+}
+
+// ─── SCREEN HELPERS ──────────────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ─── HOLD SOUND ──────────────────────────────────────────────────────────────
+let _holdAudio = null;
+function startHoldSound(){
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type='sine'; osc.frequency.value=392;
+    gain.gain.value=0.07;
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start();
+    _holdAudio={ctx,osc};
+  } catch(e){}
+  if(navigator.vibrate) navigator.vibrate([40,30,40]);
+}
+function stopHoldSound(){
+  if(_holdAudio){ try{ _holdAudio.osc.stop(); _holdAudio.ctx.close(); }catch(e){} _holdAudio=null; }
+}
+
+// Hold-to-reveal utility
+function holdBtn(el, onDown, onUp, delay=600) {
+  let timer = null;
+  function dn(e){
+    e.preventDefault();
+    el.classList.add('on');
+    startHoldSound();
+    timer = setTimeout(()=>{ onDown(); }, delay);
+  }
+  function up(e){
+    e.preventDefault();
+    el.classList.remove('on');
+    clearTimeout(timer);
+    stopHoldSound();
+    onUp();
+  }
+  el.addEventListener('mousedown', dn);
+  el.addEventListener('touchstart', dn, {passive:false});
+  el.addEventListener('mouseup', up);
+  el.addEventListener('mouseleave', up);
+  el.addEventListener('touchend', up);
+  el.addEventListener('touchcancel', up);
+}
+
+// ─── SETUP SCREEN ────────────────────────────────────────────────────────────
+function renderSetup() {
+  document.getElementById('cnt-disp').textContent = G.count;
+
+  // Role grid
+  const grid = document.getElementById('role-grid');
+  grid.innerHTML = '';
+  ROLE_ORDER.forEach(role => {
+    const cfg = ROLE_CFG[role];
+    const cell = document.createElement('div');
+    cell.className = 'role-cell';
+    cell.innerHTML = `
+      <div class="role-cell-lbl">
+        <span class="dot" style="background:${cfg.color}"></span>
+        <span>${cfg.emoji} ${role}</span>
+      </div>
+      <div class="role-adj">
+        <button class="adj-btn" data-role="${role}" data-d="-1">−</button>
+        <span class="adj-num" id="rn-${role}">${G.roles[role]}</span>
+        <button class="adj-btn" data-role="${role}" data-d="1">＋</button>
+      </div>
+    `;
+    grid.appendChild(cell);
+  });
+
+  updateRoleMsg();
+  renderNameList();
+}
+
+function updateRoleMsg() {
+  const total = Object.values(G.roles).reduce((a,b)=>a+b,0);
+  const diff = total - G.count;
+  const el = document.getElementById('role-total-msg');
+  if(diff===0){
+    el.style.color='var(--success)';
+    el.textContent=`✅ 역할 합계 ${total}명 — 인원수와 일치`;
+  } else {
+    el.style.color='var(--accent)';
+    el.textContent=`⚠️ 역할 합계 ${total}명 — ${Math.abs(diff)}명 ${diff>0?'초과':'부족'} (인원: ${G.count}명)`;
+  }
+}
+
+function renderNameList() {
+  const list = document.getElementById('plist');
+  list.innerHTML='';
+  for(let i=0;i<G.count;i++){
+    const row = document.createElement('div');
+    row.className='prow';
+    row.innerHTML=`
+      <span class="prow-lbl">${i+1}</span>
+      <input class="pname-inp" type="text" value="${esc(G.names[i])}" data-i="${i}">
+    `;
+    const inp = row.querySelector('input');
+    inp.addEventListener('input', e => { G.names[+e.target.dataset.i] = e.target.value; });
+    inp.addEventListener('mousedown', e=>e.stopPropagation());
+    inp.addEventListener('touchstart', e=>e.stopPropagation(), {passive:false});
+    list.appendChild(row);
+  }
+}
+
+function esc(s){ return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+document.getElementById('btn-minus').addEventListener('click', ()=>{
+  if(G.count<=2) return;
+  G.count--;
+  Object.assign(G.roles, calcRoles(G.count));
+  while(G.names.length > G.count) G.names.pop();
+  renderSetup();
+});
+
+document.getElementById('btn-plus').addEventListener('click', ()=>{
+  G.count++;
+  Object.assign(G.roles, calcRoles(G.count));
+  while(G.names.length < G.count) G.names.push(G.names.length+1+'번 플레이어');
+  renderSetup();
+});
+
+document.getElementById('role-grid').addEventListener('click', e=>{
+  const btn = e.target.closest('[data-role]');
+  if(!btn) return;
+  const role = btn.dataset.role;
+  const d = +btn.dataset.d;
+  const next = (G.roles[role]||0) + d;
+  if(next < 0) return;
+  G.roles[role] = next;
+  document.getElementById('rn-'+role).textContent = next;
+  updateRoleMsg();
+});
+
+document.getElementById('btn-start').addEventListener('click', ()=>{
+  // sync names from inputs
+  document.querySelectorAll('.pname-inp').forEach(inp=>{
+    G.names[+inp.dataset.i] = inp.value.trim() || (Number(inp.dataset.i)+1)+'번 플레이어';
+  });
+  const total = Object.values(G.roles).reduce((a,b)=>a+b,0);
+  if(total !== G.count){
+    alert(`역할 합계(${total}명)가 인원수(${G.count}명)와 다릅니다.\n조정 후 다시 시작해주세요.`);
+    return;
+  }
+  if(G.roles['마피아'] < 1){ alert('마피아가 최소 1명 필요합니다.'); return; }
+  startGame();
+});
+
+// ─── GAME START ──────────────────────────────────────────────────────────────
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function startGame(){
+  let roles=[];
+  ROLE_ORDER.forEach(r=>{ for(let i=0;i<(G.roles[r]||0);i++) roles.push(r); });
+  roles = shuffle(roles);
+  G.players = roles.map((role,i)=>({ name:G.names[i]||(i+1)+'번 플레이어', role, alive:true }));
+  G.roleIdx = 0;
+  G.phase = 0;
+  timerReset();
+  showRoleScreen();
+}
+
+// ─── ROLE DISTRIBUTION ───────────────────────────────────────────────────────
+function showRoleScreen(){
+  show('s-role');
+  renderRoleStep();
+}
+
+function renderRoleStep(){
+  const i = G.roleIdx;
+  const p = G.players[i];
+  document.getElementById('role-player-lbl').textContent = `${p.name}님, 확인하세요`;
+  document.getElementById('role-progress-lbl').textContent = `${i+1} / ${G.count}`;
+
+  // Dots
+  const dots = document.getElementById('role-dots');
+  dots.innerHTML='';
+  G.players.forEach((_,j)=>{
+    const d = document.createElement('div');
+    d.style.cssText = `width:8px;height:8px;border-radius:50%;background:${j<i?'var(--success)':j===i?'var(--accent)':'var(--border)'}`;
+    dots.appendChild(d);
+  });
+
+  // Reset reveal card
+  resetRevealCard();
+
+  // Next button label
+  document.getElementById('btn-role-next').textContent =
+    i < G.count-1
+      ? `✅ 확인 완료 — ${G.players[i+1].name}으로`
+      : '✅ 모두 확인 완료 — 게임 시작!';
+}
+
+function resetRevealCard(){
+  const card = document.getElementById('reveal-card');
+  card.style.borderColor='';
+  card.innerHTML=`
+    <div style="font-size:50px">🤫</div>
+    <div class="dim" style="text-align:center;font-size:13px;line-height:1.8">
+      아래 버튼을 <strong style="color:var(--text)">꾹 누르는 동안만</strong><br>역할이 표시됩니다
+    </div>
+  `;
+}
+
+// Role hold button — clone to remove old listeners
+(function(){
+  const wrap = document.getElementById('role-hold-btn').parentNode;
+  const orig = document.getElementById('role-hold-btn');
+  orig.id=''; // detach id temporarily so we can recreate
+  orig.remove();
+  const btn = document.createElement('button');
+  btn.id='role-hold-btn';
+  btn.className='hold-btn';
+  btn.style.marginBottom='12px';
+  btn.textContent='👆 꾹 눌러서 역할 확인';
+  wrap.insertBefore(btn, document.getElementById('btn-role-next'));
+
+  holdBtn(btn,
+    ()=>{
+      const p = G.players[G.roleIdx];
+      const cfg = ROLE_CFG[p.role];
+      const card = document.getElementById('reveal-card');
+      card.style.borderColor = cfg.color;
+      let extra = '';
+      if(p.role==='마피아'){
+        const teammates = G.players
+          .map((x,i)=>({...x,num:i+1}))
+          .filter((_,i)=>i!==G.roleIdx && G.players[i].role==='마피아');
+        extra = teammates.length>0
+          ? `<div style="margin-top:10px;font-size:13px;color:var(--mafia);font-weight:700">동료 마피아: ${teammates.map(t=>t.name).join(', ')}</div>`
+          : `<div style="margin-top:10px;font-size:13px;color:var(--dim)">당신만 마피아입니다</div>`;
+      }
+      card.innerHTML=`
+        <div style="font-size:52px">${cfg.emoji}</div>
+        <div class="reveal-role" style="color:${cfg.color}">${p.role}</div>
+        <div class="reveal-desc">${cfg.desc}</div>
+        ${extra}
+      `;
+    },
+    ()=>{ resetRevealCard(); }
+  );
+})();
+
+document.getElementById('btn-role-next').addEventListener('click', ()=>{
+  resetRevealCard();
+  G.roleIdx++;
+  if(G.roleIdx >= G.count) startGamePhases();
+  else renderRoleStep();
+});
+
+// ─── GAME PHASES ─────────────────────────────────────────────────────────────
+function startGamePhases(){
+  G.phase = 1; // 역할 확인 시 마피아 동료 공개했으므로 첫 밤 건너뜀
+  G.nightStep = 0;
+  show('s-game');
+  renderPhase();
+}
+
+function buildNightSteps(){
+  const s=[];
+  if((G.roles['마피아']||0)>0) s.push('마피아');
+  if((G.roles['의사']||0)>0)   s.push('의사');
+  if((G.roles['경찰']||0)>0)   s.push('경찰');
+  return s;
+}
+
+function prevPhase(){
+  if(isNight() && roundNum()>1 && G.nightStep>0){
+    G.nightStep--;
+    renderNight(roundNum());
+  } else {
+    G.nightStep=0;
+    if(G.phase>1){ G.phase--; renderPhase(); }
+  }
+}
+function nextPhase(){
+  const steps=buildNightSteps();
+  if(isNight() && roundNum()>1 && G.nightStep<steps.length-1){
+    G.nightStep++;
+    renderNight(roundNum());
+  } else {
+    G.nightStep=0;
+    G.phase++;
+    renderPhase();
+  }
+}
+
+const isNight = ()=> G.phase%2===0;
+const roundNum = ()=> Math.floor(G.phase/2)+1;
+
+function renderPhase(){
+  const night = isNight();
+  const round = roundNum();
+  const icon = document.getElementById('phase-icon');
+  const lbl  = document.getElementById('phase-lbl');
+  icon.textContent = night ? '🌙' : '☀️';
+  lbl.textContent  = `${round}번째 ${night?'밤':'낮'}`;
+  lbl.className    = `phase-lbl ${night?'night-clr':'day-clr'}`;
+
+  document.getElementById('btn-prev').classList.toggle('hidden', G.phase<=1 && G.nightStep===0);
+  document.getElementById('game-scroll').scrollTop=0;
+
+  if(night){ renderNight(round); }
+  else      { renderDay(round); timerReset(); }
+}
+
+
+
+function renderNight(round){
+  document.getElementById('night-wrap').style.display='';
+  document.getElementById('day-wrap').style.display='none';
+
+  // 게임 시작 시 1번째 밤은 건너뛰므로 round===1은 사용 안 함
+  // 2번째 밤~: 마피아→의사→경찰 단계
+  renderNightStep(round);
+}
+
+const NIGHT_ROLE_CFG = {
+  마피아:{ emoji:'🔪', color:'#e94560', label:'처형', guide:'마피아는 스마트폰을 가져가세요.<br>처형할 플레이어를 선택하고 확정하세요.' },
+  의사:  { emoji:'💉', color:'#27ae60', label:'보호', guide:'의사는 스마트폰을 가져가세요.<br>보호할 플레이어를 선택하고 확정하세요.' },
+  경찰:  { emoji:'🔵', color:'#3498db', label:'조사', guide:'경찰은 스마트폰을 가져가세요.<br>조사할 플레이어를 선택하면 마피아 여부를 확인해드립니다.' },
+};
+
+function renderNightStep(round){
+  const steps = buildNightSteps();
+  const role  = steps[G.nightStep];
+  const cfg   = NIGHT_ROLE_CFG[role];
+  const isLast= G.nightStep === steps.length-1;
+
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.textContent = isLast ? '낮으로 ▶' : `${NIGHT_ROLE_CFG[steps[G.nightStep+1]]?.emoji||''} 다음 차례 ▶`;
+  nextBtn.disabled = true;
+  nextBtn.style.opacity='0.35';
+
+  document.getElementById('night-guide').innerHTML =
+    `<strong>${cfg.emoji} ${role} 차례</strong><br><br>${cfg.guide}`;
+
+  const action = document.getElementById('night-action');
+  action.innerHTML='';
+
+  // Player grid
+  const grid = document.createElement('div');
+  grid.className='nsel-grid';
+
+  let selectedIdx = null;
+
+  // Result box (hidden until confirm)
+  const resultBox = document.createElement('div');
+  resultBox.className='night-result-box';
+  resultBox.style.cssText='color:transparent;font-size:15px';
+  resultBox.textContent='선택 후 확정 버튼을 누르세요';
+
+  // Confirm button
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className='confirm-btn';
+  confirmBtn.style.cssText=`background:${cfg.color};color:#fff`;
+  confirmBtn.textContent=`${cfg.emoji} ${cfg.label} 확정`;
+  confirmBtn.disabled=true;
+
+  G.players.forEach((p,i)=>{
+    if(!p.alive) return;
+    const btn=document.createElement('button');
+    btn.className='nsel-btn';
+    btn.textContent=p.name;
+    btn.addEventListener('click',()=>{
+      grid.querySelectorAll('.nsel-btn').forEach(b=>{
+        b.classList.remove('sel');
+        b.style.background='';
+        b.style.borderColor='var(--border)';
+        b.style.color='var(--dim)';
+      });
+      btn.classList.add('sel');
+      btn.style.background=cfg.color;
+      btn.style.borderColor=cfg.color;
+      btn.style.color='#fff';
+      selectedIdx=i;
+      confirmBtn.disabled=false;
+    });
+    grid.appendChild(btn);
+  });
+
+  confirmBtn.addEventListener('click',()=>{
+    if(selectedIdx===null) return;
+    const p=G.players[selectedIdx];
+
+    // Store choice
+    if(role==='마피아') G.nightChoices.mafia=selectedIdx;
+    else if(role==='의사') G.nightChoices.doctor=selectedIdx;
+    else if(role==='경찰'){
+      G.nightChoices.police=selectedIdx;
+      const isM=p.role==='마피아';
+      resultBox.style.color=isM?'#e94560':'#3498db';
+      resultBox.textContent=isM
+        ? `${p.name} — 🔴 마피아입니다!`
+        : `${p.name} — ⬜ 시민(무고)입니다`;
+    }
+
+    if(role!=='경찰'){
+      resultBox.style.color=cfg.color;
+      resultBox.textContent=`✅ ${p.name} ${cfg.label} 확정`;
+    }
+
+    // Lock grid & confirm
+    grid.querySelectorAll('.nsel-btn').forEach(b=>b.disabled=true);
+    confirmBtn.disabled=true;
+    confirmBtn.textContent='✅ 완료';
+
+    // Enable next
+    nextBtn.disabled=false;
+    nextBtn.style.opacity='1';
+  });
+
+  action.appendChild(grid);
+  action.appendChild(resultBox);
+  action.appendChild(confirmBtn);
+}
+
+function renderDay(round){
+  document.getElementById('night-wrap').style.display='none';
+  document.getElementById('day-wrap').style.display='';
+  document.getElementById('btn-next').textContent='밤으로 ▶';
+
+  // ── 밤 결과 발표 ──
+  const rc = document.getElementById('night-result-card');
+  const nc = G.nightChoices;
+  if(round>1 && nc.mafia!==null){
+    const killed = nc.mafia===nc.doctor ? null : nc.mafia;
+    const saved  = nc.mafia===nc.doctor;
+
+    let html='<div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">🌙 어젯밤 결과</div>';
+    if(killed!==null){
+      G.players[killed].alive=false;
+      html+=`<div style="font-size:17px;font-weight:800;color:var(--mafia)">🔪 ${G.players[killed].name}이(가) 처형되었습니다</div>`;
+    } else if(saved){
+      html+=`<div style="font-size:17px;font-weight:800;color:var(--doctor)">💉 의사가 처형 대상을 구했습니다<br><span style="font-size:13px;font-weight:500;color:var(--dim)">아무도 죽지 않았습니다</span></div>`;
+    } else {
+      html+=`<div style="font-size:17px;font-weight:800;color:var(--dim)">아무도 처형되지 않았습니다</div>`;
+    }
+    rc.innerHTML=html;
+    rc.style.display='';
+    rc.style.borderColor=killed!==null?'var(--mafia)':'var(--doctor)';
+
+    // 다음 밤을 위해 선택 초기화
+    G.nightChoices={mafia:null,doctor:null,police:null};
+  } else {
+    rc.style.display='none';
+  }
+
+  document.getElementById('day-guide').innerHTML=`
+    <strong>${round}번째 낮 — 토론 시간</strong><br><br>
+    모두 눈을 뜨세요. 자유롭게 토론 후 투표로 처형 여부를 결정하세요.<br><br>
+    <span style="color:var(--dim);font-size:13px">탈락자는 아래 명단에서 체크를 해제하세요.</span>
+  `;
+
+  renderSurvivorList();
+  checkWin();
+}
+
+function renderSurvivorList(){
+  const list = document.getElementById('sv-list');
+  list.innerHTML='';
+  G.players.forEach((p,i)=>{
+    const row = document.createElement('div');
+    row.className='sv-item'+(p.alive?'':' dead');
+    row.innerHTML=`
+      <div class="sv-chk${p.alive?' on':''}" data-i="${i}">${p.alive?'✓':''}</div>
+      <div>
+        <div class="sv-name">${esc(p.name)}</div>
+        <div class="sv-num">${i+1}번 플레이어</div>
+      </div>
+    `;
+    row.querySelector('.sv-chk').addEventListener('click', ()=>{
+      G.players[i].alive = !G.players[i].alive;
+      renderSurvivorList();
+      checkWin();
+    });
+    list.appendChild(row);
+  });
+}
+
+function checkWin(){
+  const alive   = G.players.filter(p=>p.alive);
+  const mafiaA  = alive.filter(p=>p.role==='마피아').length;
+  const civilA  = alive.filter(p=>p.role!=='마피아').length;
+  if(mafiaA===0)          showResult('citizen');
+  else if(mafiaA>=civilA) showResult('mafia');
+}
+
+function showResult(winner){
+  timerStop();
+  if(winner==='citizen'){
+    document.getElementById('res-emoji').textContent='🎉';
+    document.getElementById('res-title').textContent='시민 승리!';
+    document.getElementById('res-title').style.color='var(--success)';
+    document.getElementById('res-sub').textContent='모든 마피아를 처형했습니다. 평화로운 마을을 지켜냈습니다!';
+  } else {
+    document.getElementById('res-emoji').textContent='🔪';
+    document.getElementById('res-title').textContent='마피아 승리!';
+    document.getElementById('res-title').style.color='var(--accent)';
+    document.getElementById('res-sub').textContent='마피아가 마을을 장악했습니다. 시민들은 패배했습니다!';
+  }
+
+  const rolesDiv = document.getElementById('res-roles');
+  rolesDiv.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">전체 역할 공개</div>';
+  G.players.forEach(p=>{
+    const cfg = ROLE_CFG[p.role];
+    const el = document.createElement('div');
+    el.className='rr-item';
+    el.innerHTML=`
+      <span style="font-size:20px">${cfg.emoji}</span>
+      <span style="flex:1;font-size:14px;font-weight:600;${p.alive?'':'text-decoration:line-through;color:var(--dim)'}">${esc(p.name)}</span>
+      <span style="font-size:12px;font-weight:800;color:${cfg.color};margin-right:6px">${p.role}</span>
+      ${!p.alive?'<span style="font-size:11px;color:var(--dim)">탈락</span>':''}
+    `;
+    rolesDiv.appendChild(el);
+  });
+
+  show('s-result');
+}
+
+// ─── TIMER ───────────────────────────────────────────────────────────────────
+function timerToggle(){ G.timer.running ? timerStop() : timerStart(); }
+
+function timerStart(){
+  if(G.timer.sec<=0) timerReset();
+  G.timer.running=true;
+  const startBtn = document.getElementById('t-start-btn');
+  if(startBtn){ startBtn.textContent='정지'; startBtn.className='t-btn t-stop'; }
+  G.timer.iv = setInterval(()=>{
+    G.timer.sec--;
+    updateTimerDisplay();
+    if(G.timer.sec<=0){ timerStop(); document.getElementById('t-disp').textContent='⏰ 종료!'; }
+  },1000);
+}
+
+function timerStop(){
+  G.timer.running=false;
+  clearInterval(G.timer.iv);
+  const startBtn = document.getElementById('t-start-btn');
+  if(startBtn){ startBtn.textContent='시작'; startBtn.className='t-btn t-start'; }
+}
+
+function timerReset(){
+  timerStop();
+  G.timer.sec=300;
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay(){
+  const el = document.getElementById('t-disp');
+  if(!el) return;
+  const m = Math.floor(G.timer.sec/60);
+  const s = G.timer.sec%60;
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if(!G.timer.running) el.className='t-display';
+  else if(G.timer.sec<=30) el.className='t-display t-urgent';
+  else el.className='t-display t-running';
+}
+
+// ─── RESET ───────────────────────────────────────────────────────────────────
+function resetGame(){
+  timerStop();
+  initState();
+  renderSetup();
+  show('s-setup');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+initState();
+renderSetup();
+</script>
+</body>
+</html>
