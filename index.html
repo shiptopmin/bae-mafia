@@ -340,11 +340,41 @@ function show(id) {
   window.scrollTo(0,0);
 }
 
+// ─── HOLD SOUND ──────────────────────────────────────────────────────────────
+let _holdAudio = null;
+function startHoldSound(){
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type='sine'; osc.frequency.value=392;
+    gain.gain.value=0.07;
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start();
+    _holdAudio={ctx,osc};
+  } catch(e){}
+  if(navigator.vibrate) navigator.vibrate([40,30,40]);
+}
+function stopHoldSound(){
+  if(_holdAudio){ try{ _holdAudio.osc.stop(); _holdAudio.ctx.close(); }catch(e){} _holdAudio=null; }
+}
+
 // Hold-to-reveal utility
 function holdBtn(el, onDown, onUp, delay=600) {
   let timer = null;
-  function dn(e){ e.preventDefault(); el.classList.add('on'); timer = setTimeout(onDown, delay); }
-  function up(e){ e.preventDefault(); el.classList.remove('on'); clearTimeout(timer); onUp(); }
+  function dn(e){
+    e.preventDefault();
+    el.classList.add('on');
+    startHoldSound();
+    timer = setTimeout(()=>{ onDown(); }, delay);
+  }
+  function up(e){
+    e.preventDefault();
+    el.classList.remove('on');
+    clearTimeout(timer);
+    stopHoldSound();
+    onUp();
+  }
   el.addEventListener('mousedown', dn);
   el.addEventListener('touchstart', dn, {passive:false});
   el.addEventListener('mouseup', up);
@@ -535,10 +565,20 @@ function resetRevealCard(){
       const cfg = ROLE_CFG[p.role];
       const card = document.getElementById('reveal-card');
       card.style.borderColor = cfg.color;
+      let extra = '';
+      if(p.role==='마피아'){
+        const teammates = G.players
+          .map((x,i)=>({...x,num:i+1}))
+          .filter((_,i)=>i!==G.roleIdx && G.players[i].role==='마피아');
+        extra = teammates.length>0
+          ? `<div style="margin-top:10px;font-size:13px;color:var(--mafia);font-weight:700">동료 마피아: ${teammates.map(t=>t.name).join(', ')}</div>`
+          : `<div style="margin-top:10px;font-size:13px;color:var(--dim)">당신만 마피아입니다</div>`;
+      }
       card.innerHTML=`
         <div style="font-size:52px">${cfg.emoji}</div>
         <div class="reveal-role" style="color:${cfg.color}">${p.role}</div>
         <div class="reveal-desc">${cfg.desc}</div>
+        ${extra}
       `;
     },
     ()=>{ resetRevealCard(); }
@@ -554,6 +594,8 @@ document.getElementById('btn-role-next').addEventListener('click', ()=>{
 
 // ─── GAME PHASES ─────────────────────────────────────────────────────────────
 function startGamePhases(){
+  G.phase = 1; // 역할 확인 시 마피아 동료 공개했으므로 첫 밤 건너뜀
+  G.nightStep = 0;
   show('s-game');
   renderPhase();
 }
@@ -593,7 +635,7 @@ function renderPhase(){
   lbl.textContent  = `${round}번째 ${night?'밤':'낮'}`;
   lbl.className    = `phase-lbl ${night?'night-clr':'day-clr'}`;
 
-  document.getElementById('btn-prev').classList.toggle('hidden', G.phase===0 && G.nightStep===0);
+  document.getElementById('btn-prev').classList.toggle('hidden', G.phase<=1 && G.nightStep===0);
   document.getElementById('game-scroll').scrollTop=0;
 
   if(night){ renderNight(round); }
@@ -731,6 +773,7 @@ function renderPoliceGrid(){
 function renderDay(round){
   document.getElementById('night-wrap').style.display='none';
   document.getElementById('day-wrap').style.display='';
+  document.getElementById('btn-next').textContent='밤으로 ▶';
 
   document.getElementById('day-guide').innerHTML=`
     <strong>${round}번째 낮 — 토론 시간</strong><br><br>
