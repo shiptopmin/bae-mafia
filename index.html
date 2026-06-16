@@ -312,7 +312,8 @@ function initState() {
     names: [],
     players: [],   // {name, role, alive}
     roleIdx: 0,
-    phase: 0,      // 0=night1, 1=day1, 2=night2, ...
+    phase: 0,
+    nightStep: 0,      // 0=night1, 1=day1, 2=night2, ...
     timer: { sec:300, running:false, iv:null },
   };
   G.names = makenames(G.count);
@@ -557,8 +558,28 @@ function startGamePhases(){
   renderPhase();
 }
 
-function prevPhase(){ if(G.phase>0){ G.phase--; renderPhase(); } }
-function nextPhase(){ G.phase++; renderPhase(); }
+// nightStep: 0=마피아, 1=의사, 2=경찰 (round>1 밤에만 사용)
+const NIGHT_STEPS = ['마피아','의사','경찰'];
+
+function prevPhase(){
+  if(isNight() && roundNum()>1 && G.nightStep>0){
+    G.nightStep--;
+    renderNight(roundNum());
+  } else {
+    G.nightStep=0;
+    if(G.phase>0){ G.phase--; renderPhase(); }
+  }
+}
+function nextPhase(){
+  if(isNight() && roundNum()>1 && G.nightStep<2){
+    G.nightStep++;
+    renderNight(roundNum());
+  } else {
+    G.nightStep=0;
+    G.phase++;
+    renderPhase();
+  }
+}
 
 const isNight = ()=> G.phase%2===0;
 const roundNum = ()=> Math.floor(G.phase/2)+1;
@@ -572,13 +593,19 @@ function renderPhase(){
   lbl.textContent  = `${round}번째 ${night?'밤':'낮'}`;
   lbl.className    = `phase-lbl ${night?'night-clr':'day-clr'}`;
 
-  // Prev button visibility
-  document.getElementById('btn-prev').classList.toggle('hidden', G.phase===0);
-
+  document.getElementById('btn-prev').classList.toggle('hidden', G.phase===0 && G.nightStep===0);
   document.getElementById('game-scroll').scrollTop=0;
 
   if(night){ renderNight(round); }
   else      { renderDay(round); timerReset(); }
+}
+
+function updateNightNav(){
+  const step = G.nightStep;
+  const nextBtn = document.getElementById('btn-next');
+  if(step===0) nextBtn.textContent='의사 차례 ▶';
+  else if(step===1) nextBtn.textContent='경찰 차례 ▶';
+  else nextBtn.textContent='낮으로 ▶';
 }
 
 function renderNight(round){
@@ -590,42 +617,86 @@ function renderNight(round){
   const guide = document.getElementById('night-guide');
 
   if(round===1){
+    // 첫 번째 밤: 마피아 동료 확인만
     mSec.style.display='';
     pSec.style.display='none';
+    document.getElementById('btn-next').textContent='낮으로 ▶';
     guide.innerHTML=`
       <strong>모두 눈을 감으세요.</strong><br><br>
       마피아들은 차례로 스마트폰을 가져가 버튼을 꾹 눌러 동료를 확인하세요.<br>
       확인 후 스마트폰을 내려놓고 다시 눈을 감으세요.
     `;
 
-    // Build mafia list text
-    const mafias = G.players
-      .map((p,i)=>({...p, idx:i}))
-      .filter(p=>p.role==='마피아');
+    const mafias = G.players.filter(p=>p.role==='마피아');
     const revText = mafias.map(p=>`<em>${p.name}</em>`).join(', ');
     document.getElementById('mafia-reveal').innerHTML = `🔴 마피아는 ${revText}입니다`;
 
-    // Re-wire mafia hold button (clone to clear old listeners)
     const oldBtn = document.getElementById('mafia-hold-btn');
     const newBtn = oldBtn.cloneNode(true);
     oldBtn.parentNode.replaceChild(newBtn, oldBtn);
     const revEl = document.getElementById('mafia-reveal');
-    holdBtn(newBtn,
-      ()=>revEl.classList.add('show'),
-      ()=>revEl.classList.remove('show')
-    );
+    holdBtn(newBtn, ()=>revEl.classList.add('show'), ()=>revEl.classList.remove('show'));
 
   } else {
-    mSec.style.display='none';
-    pSec.style.display='';
-    guide.innerHTML=`
-      <strong>모두 눈을 감으세요.</strong><br><br>
-      🔪 <strong>마피아</strong> — 처형할 사람을 조용히 지목하세요.<br>
-      💉 <strong>의사</strong> — 보호할 사람을 조용히 지목하세요.<br>
-      🔵 <strong>경찰</strong> — 아래에서 조사를 비밀리에 진행하세요.
-    `;
+    // 2번째 밤~: 마피아→의사→경찰 단계
+    const step = G.nightStep;
+    updateNightNav();
 
-    renderPoliceGrid();
+    if(step===0){
+      // 마피아 차례
+      mSec.style.display='';
+      pSec.style.display='none';
+      guide.innerHTML=`
+        <strong>🔪 마피아 차례</strong><br><br>
+        마피아는 스마트폰을 가져가세요.<br>
+        버튼을 꾹 눌러 생존자 명단을 확인하고, 처형할 사람을 합의해 결정하세요.
+      `;
+
+      // 생존자 목록 hold 버튼으로 표시
+      const alive = G.players.filter(p=>p.alive).map(p=>`<em>${p.name}</em>`).join(', ');
+      document.getElementById('mafia-reveal').innerHTML = `👁 생존자: ${alive}`;
+
+      const oldBtn = document.getElementById('mafia-hold-btn');
+      const newBtn = oldBtn.cloneNode(true);
+      newBtn.textContent='🔴 꾹 눌러서 생존자 명단 확인';
+      oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+      const revEl = document.getElementById('mafia-reveal');
+      holdBtn(newBtn, ()=>revEl.classList.add('show'), ()=>revEl.classList.remove('show'));
+
+    } else if(step===1){
+      // 의사 차례
+      mSec.style.display='';
+      pSec.style.display='none';
+      guide.innerHTML=`
+        <strong>💉 의사 차례</strong><br><br>
+        의사는 스마트폰을 가져가세요.<br>
+        버튼을 꾹 눌러 생존자 명단을 확인하고, 보호할 사람을 마음속으로 결정하세요.
+      `;
+
+      const alive = G.players.filter(p=>p.alive).map(p=>`<em>${p.name}</em>`).join(', ');
+      document.getElementById('mafia-reveal').innerHTML = `👁 생존자: ${alive}`;
+
+      const oldBtn = document.getElementById('mafia-hold-btn');
+      const newBtn = oldBtn.cloneNode(true);
+      newBtn.textContent='💉 꾹 눌러서 생존자 명단 확인';
+      newBtn.style.borderColor='var(--doctor)';
+      newBtn.style.color='var(--doctor)';
+      oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+      const revEl = document.getElementById('mafia-reveal');
+      revEl.style.color='transparent';
+      holdBtn(newBtn, ()=>revEl.classList.add('show'), ()=>revEl.classList.remove('show'));
+
+    } else {
+      // 경찰 차례
+      mSec.style.display='none';
+      pSec.style.display='';
+      guide.innerHTML=`
+        <strong>🔵 경찰 차례</strong><br><br>
+        경찰은 스마트폰을 가져가세요.<br>
+        아래에서 조사할 플레이어를 꾹 눌러 마피아 여부를 확인하세요.
+      `;
+      renderPoliceGrid();
+    }
   }
 }
 
