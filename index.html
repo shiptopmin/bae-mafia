@@ -340,9 +340,10 @@ function show(id) {
 }
 
 // Hold-to-reveal utility
-function holdBtn(el, onDown, onUp) {
-  function dn(e){ e.preventDefault(); el.classList.add('on'); onDown(); }
-  function up(e){ e.preventDefault(); el.classList.remove('on'); onUp(); }
+function holdBtn(el, onDown, onUp, delay=600) {
+  let timer = null;
+  function dn(e){ e.preventDefault(); el.classList.add('on'); timer = setTimeout(onDown, delay); }
+  function up(e){ e.preventDefault(); el.classList.remove('on'); clearTimeout(timer); onUp(); }
   el.addEventListener('mousedown', dn);
   el.addEventListener('touchstart', dn, {passive:false});
   el.addEventListener('mouseup', up);
