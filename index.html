@@ -3,251 +3,253 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>🌙 마피아 게임</title>
+<title>🌙 마피아</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 :root{
-  --bg:#0a0a14;--surface:#12121f;--surface2:#1a1a2e;--surface3:#0f1526;
-  --accent:#e94560;--accent2:#9b59b6;--text:#e8e8f0;--dim:#6b6b8a;
+  --bg:#0a0a14;--surface:#12121f;--surface2:#1a1a2e;--surface3:#0f0f20;
+  --accent:#e94560;--text:#e8e8f0;--dim:#5a5a7a;
   --success:#27ae60;--warn:#e67e22;--border:#1e1e35;
   --mafia:#e94560;--police:#3498db;--doctor:#27ae60;--citizen:#7f8c8d;
-  --night:#9b59b6;--day:#e67e22;
+  --night:#7c3aed;--day:#d97706;
 }
 html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:hidden}
-.screen{display:none;flex-direction:column;min-height:100vh;max-width:480px;margin:0 auto;padding:16px}
-.screen.active{display:flex}
+.page{display:none;flex-direction:column;min-height:100vh;max-width:480px;margin:0 auto;padding:16px}
+.page.active{display:flex}
 
-/* TYPOGRAPHY */
-h1{font-size:30px;font-weight:900;letter-spacing:3px;color:var(--accent)}
-.dim{color:var(--dim);font-size:13px}
-.card-title{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+/* HEADER */
+.hdr{text-align:center;padding:24px 0 20px}
+.hdr-icon{font-size:44px;line-height:1;margin-bottom:6px}
+.hdr h1{font-size:28px;font-weight:900;letter-spacing:3px;color:var(--accent)}
+.hdr-sub{color:var(--dim);font-size:12px;margin-top:5px}
 
 /* CARD */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px}
+.card-title{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
 
-/* HEADER */
-.hdr{text-align:center;padding:28px 0 22px}
-.hdr-moon{font-size:48px;line-height:1;margin-bottom:8px}
-.hdr-sub{color:var(--dim);font-size:13px;margin-top:6px;letter-spacing:.5px}
-
-/* PLAYER COUNT */
-.count-wrap{display:flex;align-items:center;justify-content:center;gap:24px}
-.cnt-btn{width:48px;height:48px;border-radius:50%;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s,transform .1s;flex-shrink:0;line-height:1}
-.cnt-btn:active{background:var(--accent);color:#fff;transform:scale(.88)}
-.cnt-num{font-size:54px;font-weight:900;color:var(--text);min-width:64px;text-align:center;line-height:1}
-
-/* ROLE GRID */
-.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.role-cell{background:var(--surface2);border-radius:14px;padding:14px 12px}
-.role-cell-lbl{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:10px}
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.role-adj{display:flex;align-items:center;justify-content:space-between}
-.adj-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
-.adj-btn:active{opacity:.5}
-.adj-num{font-size:26px;font-weight:800;min-width:32px;text-align:center}
-
-/* PLAYER LIST */
-.plist{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto}
-.prow{display:flex;align-items:center;gap:10px}
-.prow-lbl{font-size:12px;color:var(--dim);width:28px;flex-shrink:0;text-align:right}
-.pname-inp{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;user-select:text;-webkit-user-select:text}
-.pname-inp:focus{border-color:var(--accent)}
+/* INPUT */
+.inp{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-size:16px;outline:none;user-select:text;-webkit-user-select:text}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--dim)}
+.inp-row{display:flex;gap:10px;margin-bottom:12px}
+.inp-row .inp{flex:1}
 
 /* BUTTONS */
-.btn{width:100%;padding:17px;border-radius:16px;border:none;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:opacity .15s,transform .15s}
+.btn{width:100%;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.3px;transition:opacity .15s,transform .15s;margin-bottom:10px}
 .btn:active{transform:scale(.96);opacity:.8}
+.btn:last-child{margin-bottom:0}
 .btn-red{background:linear-gradient(135deg,#e94560,#c0392b);color:#fff}
 .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
 .btn-outline{background:transparent;color:var(--accent);border:2px solid var(--accent)}
 .btn-blue{background:linear-gradient(135deg,#2980b9,#1a5276);color:#fff}
+.btn-green{background:linear-gradient(135deg,#27ae60,#1e8449);color:#fff}
+.btn-sm{padding:10px 16px;font-size:14px;border-radius:10px;width:auto}
+.btn:disabled{opacity:.35;cursor:default;transform:none}
+
+/* ROOM CODE */
+.room-code{font-size:48px;font-weight:900;letter-spacing:8px;text-align:center;color:var(--accent);padding:16px 0;font-variant-numeric:tabular-nums}
+.room-code-sm{font-size:22px;font-weight:900;letter-spacing:4px;color:var(--accent)}
+
+/* PLAYER LIST */
+.player-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.player-item:last-child{border-bottom:none}
+.player-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.player-name{flex:1;font-size:15px;font-weight:600}
+.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.host-badge{background:#7c3aed22;color:#7c3aed}
+
+/* ROLE REVEAL */
+.reveal-box{min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border-radius:16px;padding:24px;border:2px solid var(--border);transition:border-color .2s;text-align:center}
+.reveal-role{font-size:38px;font-weight:900;letter-spacing:2px}
+.reveal-desc{font-size:13px;color:var(--dim);line-height:1.7;margin-top:4px}
 
 /* HOLD BUTTON */
-.hold-btn{width:100%;padding:22px;border-radius:16px;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:16px;font-weight:800;cursor:pointer;text-align:center;letter-spacing:.5px;transition:background .1s,color .1s}
+.hold-btn{width:100%;padding:20px;border-radius:16px;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:16px;font-weight:800;cursor:pointer;text-align:center;transition:background .1s,color .1s;margin:12px 0}
 .hold-btn.on{background:var(--accent);color:#fff}
-.hold-btn-blue{border-color:var(--police);color:var(--police)}
-.hold-btn-blue.on{background:var(--police);color:#fff}
 
-/* REVEAL CARD */
-.reveal-card{min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border-radius:18px;padding:24px;border:2px solid var(--border);transition:border-color .2s;margin-bottom:14px}
-.reveal-role{font-size:40px;font-weight:900;letter-spacing:2px}
-.reveal-desc{font-size:13px;color:var(--dim);text-align:center;line-height:1.7;margin-top:4px}
-
-/* PHASE */
-.phase-bar{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 0 10px}
-.phase-icon{font-size:30px}
-.phase-lbl{font-size:22px;font-weight:900}
+/* PHASE BAR */
+.phase-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 0 8px}
+.phase-icon{font-size:28px}
+.phase-lbl{font-size:20px;font-weight:900}
 .night-clr{color:var(--night)}
 .day-clr{color:var(--day)}
 
-/* GUIDE BOX */
-.guide{background:var(--surface2);border-radius:14px;padding:18px;margin-bottom:14px;font-size:14px;line-height:1.9;color:var(--dim)}
-.guide strong{color:var(--text);font-weight:700}
-.guide em{color:var(--accent);font-style:normal;font-weight:600}
-
-/* POLICE */
-.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-.pbtn{padding:13px 6px;border-radius:12px;border:2px solid var(--police);background:transparent;color:var(--police);font-size:12px;font-weight:700;cursor:pointer;text-align:center;line-height:1.3;transition:background .1s,color .1s;word-break:break-all}
-.pbtn.on{background:var(--police);color:#fff}
-.pbtn.dead{border-color:var(--border);color:var(--dim);opacity:.4;pointer-events:none}
-.p-result{margin-top:10px;padding:16px;border-radius:12px;background:var(--surface);font-size:15px;font-weight:800;text-align:center;min-height:54px;display:flex;align-items:center;justify-content:center;transition:color .1s;color:transparent}
-.p-result.show-m{color:var(--mafia)}
-.p-result.show-c{color:var(--police)}
-
-/* MAFIA REVEAL */
-.m-reveal{margin-top:12px;padding:18px;border-radius:12px;background:var(--surface);font-size:15px;font-weight:800;text-align:center;min-height:54px;display:flex;align-items:center;justify-content:center;color:transparent;transition:color .1s}
-.m-reveal.show{color:var(--mafia)}
+/* GUIDE */
+.guide{background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:12px;font-size:14px;line-height:1.9;color:var(--dim)}
+.guide strong{color:var(--text)}
 
 /* NIGHT SELECT */
-.nsel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
-.nsel-btn{padding:14px 6px;border-radius:12px;border:2px solid var(--border);background:transparent;color:var(--dim);font-size:13px;font-weight:700;cursor:pointer;text-align:center;line-height:1.3;transition:all .15s;word-break:break-all}
-.nsel-btn:active{opacity:.7}
-.nsel-btn.sel{color:#fff}
-.nsel-btn:disabled{opacity:.35;cursor:default}
-.night-result-box{padding:16px;border-radius:12px;font-size:14px;font-weight:700;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center;background:var(--surface2);margin:10px 0}
-.confirm-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;transition:opacity .15s}
+.sel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.sel-btn{padding:13px 6px;border-radius:12px;border:2px solid var(--border);background:transparent;color:var(--dim);font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all .12s;word-break:break-all;line-height:1.3}
+.sel-btn.picked{color:#fff}
+.sel-btn:disabled{opacity:.35;cursor:default}
+.confirm-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:800;cursor:pointer;margin-top:6px;color:#fff;transition:opacity .15s}
 .confirm-btn:disabled{opacity:.3;cursor:default}
+.result-box{padding:15px;border-radius:12px;background:var(--surface2);font-size:15px;font-weight:700;text-align:center;margin:10px 0;min-height:50px;display:flex;align-items:center;justify-content:center;color:var(--dim)}
+
+/* VOTE */
+.vote-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0}
+.vote-btn{padding:16px 8px;border-radius:14px;border:2px solid var(--border);background:transparent;color:var(--text);font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all .12s;position:relative}
+.vote-btn.my-vote{border-color:var(--accent);background:#e9456015}
+.vote-btn:disabled{opacity:.35;cursor:default}
+.vote-count{position:absolute;top:6px;right:8px;font-size:11px;color:var(--dim);font-weight:600}
+
+/* RESULT */
+.result-announce{padding:20px;border-radius:16px;margin-bottom:14px;text-align:center}
+.result-announce.kill{background:#e9456015;border:1px solid var(--mafia)}
+.result-announce.save{background:#27ae6015;border:1px solid var(--doctor)}
+.result-announce.none{background:var(--surface2);border:1px solid var(--border)}
+
+/* STATUS DOTS */
+.status-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.sdot{width:10px;height:10px;border-radius:50%}
 
 /* SURVIVOR LIST */
-.sv-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.sv-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
 .sv-item:last-child{border-bottom:none}
 .sv-item.dead{opacity:.35}
-.sv-chk{width:24px;height:24px;border-radius:7px;border:2px solid var(--accent);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .1s,border-color .1s;font-size:14px;color:transparent;font-weight:900}
-.sv-chk.on{background:var(--success);border-color:var(--success);color:#fff}
 .sv-name{flex:1;font-size:15px;font-weight:600}
-.sv-num{font-size:12px;color:var(--dim)}
 
 /* TIMER */
-.timer-wrap{display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:14px;padding:14px 16px;margin-bottom:14px}
-.t-lbl{font-size:10px;color:var(--dim);margin-bottom:3px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
-.t-display{font-size:32px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:3px}
+.timer-wrap{display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.t-lbl{font-size:10px;color:var(--dim);margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.t-disp{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:2px}
 .t-running{color:var(--day)}
-.t-urgent{color:var(--accent);animation:blink 1s ease-in-out infinite}
+.t-urgent{color:var(--accent);animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-.t-btns{display:flex;gap:8px;margin-left:auto;flex-shrink:0}
-.t-btn{padding:9px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer}
-.t-btn:active{opacity:.6}
+.t-btns{display:flex;gap:8px;margin-left:auto}
+.t-btn{padding:8px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer}
 .t-start{background:var(--success);color:#fff;border-color:var(--success)}
 .t-stop{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* NAV */
-.nav{display:flex;gap:10px;margin-top:auto;padding-top:16px}
-.nav .btn{flex:1}
-.nav .btn.hidden{visibility:hidden}
+/* WIN */
+.win-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;text-align:center}
+.win-emoji{font-size:88px;line-height:1;margin-bottom:16px}
+.win-title{font-size:36px;font-weight:900;margin-bottom:8px}
+.win-sub{font-size:15px;color:var(--dim);margin-bottom:28px}
 
-/* STATUS */
-.status-wrap{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.spill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+/* WAITING */
+.waiting-dot{display:inline-block;animation:bounce .8s infinite}
+.waiting-dot:nth-child(2){animation-delay:.15s}
+.waiting-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 
-/* RESULT */
-.result-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;text-align:center}
-.result-emoji{font-size:90px;line-height:1;margin-bottom:16px}
-.result-title{font-size:38px;font-weight:900;margin-bottom:8px}
-.result-sub{font-size:15px;color:var(--dim);margin-bottom:32px}
-.role-reveal-list{background:var(--surface);border-radius:18px;padding:20px;width:100%;margin-bottom:28px}
-.rr-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
-.rr-item:last-child{border-bottom:none}
+/* ROLE COUNT */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.role-cell{background:var(--surface2);border-radius:14px;padding:14px}
+.role-cell-lbl{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.role-adj{display:flex;align-items:center;justify-content:space-between}
+.adj-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.adj-num{font-size:24px;font-weight:800;min-width:30px;text-align:center}
 
-/* SEPARATOR */
-.sep{height:1px;background:var(--border);margin:14px 0}
-
-/* Scroll */
+/* SCROLL */
 .scroll{overflow-y:auto;flex:1}
+.sep{height:1px;background:var(--border);margin:14px 0}
+.dim{color:var(--dim)}
+.center{text-align:center}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════
-     SCREEN 1: SETUP
-═════════════════════════════════════════════ -->
-<div id="s-setup" class="screen active">
+<!-- ══ PAGE: LOBBY ══ -->
+<div id="p-lobby" class="page active">
   <div class="hdr">
-    <div class="hdr-moon">🌙</div>
+    <div class="hdr-icon">🌙</div>
     <h1>MAFIA</h1>
-    <div class="hdr-sub">사회자 없는 마피아 게임 · 스마트폰 한 대</div>
+    <div class="hdr-sub">멀티플레이어 · 각자 폰으로</div>
   </div>
-
   <div class="card">
-    <div class="card-title">👥 참가 인원</div>
-    <div class="count-wrap">
-      <button class="cnt-btn" id="btn-minus">−</button>
-      <div class="cnt-num" id="cnt-disp">7</div>
-      <button class="cnt-btn" id="btn-plus">＋</button>
+    <div class="card-title">✏️ 내 닉네임</div>
+    <input class="inp" id="inp-nick" type="text" maxlength="8" placeholder="닉네임 입력 (최대 8자)">
+  </div>
+  <button class="btn btn-red" id="btn-create">🏠 방 만들기</button>
+  <div style="text-align:center;color:var(--dim);font-size:13px;margin:4px 0 10px">또는</div>
+  <div class="card">
+    <div class="card-title">🔑 방 코드로 입장</div>
+    <div class="inp-row">
+      <input class="inp" id="inp-code" type="text" maxlength="4" placeholder="4자리 코드" style="text-transform:uppercase;letter-spacing:4px;font-weight:800;font-size:18px">
+      <button class="btn btn-blue btn-sm" id="btn-join" style="width:auto;margin:0">입장</button>
     </div>
   </div>
-
-  <div class="card">
-    <div class="card-title">⚖️ 역할 배분</div>
-    <div class="role-grid" id="role-grid"></div>
-    <div class="sep"></div>
-    <div id="role-total-msg" class="dim" style="text-align:center;font-size:12px"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">✏️ 플레이어 이름 (터치하여 수정)</div>
-    <div class="plist" id="plist"></div>
-  </div>
-
-  <button class="btn btn-red" id="btn-start" style="margin-top:4px;margin-bottom:32px">
-    🎮 게임 시작
-  </button>
+  <div id="lobby-msg" style="text-align:center;color:var(--accent);font-size:13px;min-height:20px"></div>
 </div>
 
-<!-- ════════════════════════════════════════════
-     SCREEN 2: ROLE DISTRIBUTION
-═════════════════════════════════════════════ -->
-<div id="s-role" class="screen">
-  <div style="padding-top:28px;flex:1;display:flex;flex-direction:column">
-    <div style="text-align:center;margin-bottom:18px">
-      <div class="dim" style="margin-bottom:6px">역할 확인 차례</div>
-      <div style="font-size:21px;font-weight:900" id="role-player-lbl"></div>
-      <div class="dim" style="margin-top:8px;font-size:13px">📱 스마트폰을 해당 플레이어에게 건네주세요</div>
+<!-- ══ PAGE: WAITING ROOM ══ -->
+<div id="p-wait" class="page">
+  <div style="padding-top:20px;flex:1;display:flex;flex-direction:column">
+    <div class="center" style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--dim);margin-bottom:6px">방 코드</div>
+      <div class="room-code" id="wait-code"></div>
+      <div style="font-size:12px;color:var(--dim);margin-top:4px">친구들에게 이 코드를 알려주세요</div>
     </div>
 
-    <div class="reveal-card" id="reveal-card">
-      <div style="font-size:50px">🤫</div>
-      <div class="dim" style="text-align:center;font-size:13px;line-height:1.8">
-        아래 버튼을 <strong style="color:var(--text)">꾹 누르는 동안만</strong><br>역할이 표시됩니다
+    <div class="card" style="flex:1">
+      <div class="card-title">👥 참가자 <span id="wait-count">0</span>명</div>
+      <div id="wait-players"></div>
+    </div>
+
+    <!-- 방장 전용 설정 -->
+    <div id="host-settings" style="display:none">
+      <div class="card">
+        <div class="card-title">⚖️ 역할 배분</div>
+        <div class="role-grid" id="host-role-grid"></div>
+        <div class="sep"></div>
+        <div id="host-role-msg" class="dim center" style="font-size:12px"></div>
       </div>
+      <button class="btn btn-red" id="btn-game-start">🎮 게임 시작</button>
     </div>
 
-    <button class="hold-btn" id="role-hold-btn" style="margin-bottom:12px">
-      👆 꾹 눌러서 역할 확인
-    </button>
-
-    <button class="btn btn-ghost" id="btn-role-next">
-      ✅ 확인 완료 — 다음으로
-    </button>
-
-    <div style="text-align:center;margin-top:18px;margin-bottom:16px">
-      <div class="dim" id="role-progress-lbl"></div>
-      <div id="role-dots" style="margin-top:8px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap"></div>
+    <div id="guest-waiting" style="display:none;text-align:center;padding:20px 0;color:var(--dim)">
+      방장이 게임을 시작하길 기다리는 중
+      <span class="waiting-dot">.</span><span class="waiting-dot">.</span><span class="waiting-dot">.</span>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════
-     SCREEN 3: GAME
-═════════════════════════════════════════════ -->
-<div id="s-game" class="screen">
+<!-- ══ PAGE: ROLE REVEAL ══ -->
+<div id="p-role" class="page">
+  <div style="padding-top:30px;flex:1;display:flex;flex-direction:column">
+    <div class="center" style="margin-bottom:20px">
+      <div class="dim" style="font-size:13px;margin-bottom:6px">역할이 배정되었습니다</div>
+      <div style="font-size:20px;font-weight:800" id="role-nick"></div>
+    </div>
+    <div class="reveal-box" id="role-reveal-box">
+      <div style="font-size:48px">🤫</div>
+      <div class="dim" style="font-size:13px;line-height:1.8">아래 버튼을 <strong style="color:var(--text)">꾹 누르는 동안만</strong><br>역할이 표시됩니다</div>
+    </div>
+    <button class="hold-btn" id="role-hold-btn">👆 꾹 눌러서 역할 확인</button>
+    <button class="btn btn-green" id="btn-role-ready">✅ 확인했습니다 — 준비 완료</button>
+    <div class="center dim" style="font-size:13px;margin-top:14px" id="role-ready-status"></div>
+  </div>
+</div>
+
+<!-- ══ PAGE: GAME ══ -->
+<div id="p-game" class="page">
   <div class="phase-bar">
-    <span class="phase-icon" id="phase-icon"></span>
-    <span class="phase-lbl" id="phase-lbl"></span>
+    <span class="phase-icon" id="g-phase-icon"></span>
+    <span class="phase-lbl" id="g-phase-lbl"></span>
+    <span style="font-size:13px;color:var(--dim);margin-left:6px" id="g-round-lbl"></span>
   </div>
 
-  <div class="scroll" id="game-scroll">
-    <!-- Night content -->
-    <div id="night-wrap">
-      <div class="guide" id="night-guide"></div>
-      <div id="night-action"></div>
+  <div class="scroll" id="g-scroll">
+
+    <!-- 밤 화면 -->
+    <div id="g-night" style="display:none">
+      <div class="guide" id="g-night-guide"></div>
+      <div id="g-night-action"></div>
     </div>
 
-    <!-- Day content -->
-    <div id="day-wrap" style="display:none">
-      <div class="card" id="night-result-card" style="display:none;border-color:var(--accent)"></div>
+    <!-- 낮 화면 -->
+    <div id="g-day" style="display:none">
+      <!-- 밤 결과 -->
+      <div id="g-night-result" style="display:none;margin-bottom:12px"></div>
+
+      <!-- 타이머 -->
       <div class="timer-wrap">
         <div>
           <div class="t-lbl">토론 타이머</div>
-          <div class="t-display" id="t-disp">05:00</div>
+          <div class="t-disp" id="t-disp">05:00</div>
         </div>
         <div class="t-btns">
           <button class="t-btn t-start" id="t-start-btn" onclick="timerToggle()">시작</button>
@@ -255,499 +257,531 @@ h1{font-size:30px;font-weight:900;letter-spacing:3px;color:var(--accent)}
         </div>
       </div>
 
-      <div class="guide" id="day-guide"></div>
+      <!-- 투표 -->
+      <div class="card" id="vote-card">
+        <div class="card-title">🗳️ 처형 투표</div>
+        <div class="dim" style="font-size:12px;margin-bottom:10px">처형할 플레이어에게 투표하세요 (1인 1표)</div>
+        <div class="vote-grid" id="vote-grid"></div>
+        <div id="vote-status" style="text-align:center;font-size:13px;color:var(--dim);margin-top:10px"></div>
+      </div>
 
+      <!-- 생존자 현황 -->
       <div class="card">
-        <div class="card-title">✅ 생존자 명단 체크</div>
-        <div class="dim" style="font-size:12px;margin-bottom:12px">탈락한 플레이어의 체크를 해제하세요</div>
+        <div class="card-title">👥 생존자 현황</div>
         <div id="sv-list"></div>
       </div>
     </div>
-  </div>
 
-  <div class="nav">
-    <button class="btn btn-ghost" id="btn-prev" onclick="prevPhase()">◀ 이전</button>
-    <button class="btn btn-red" id="btn-next" onclick="nextPhase()">다음 ▶</button>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════
-     SCREEN 4: RESULT
-═════════════════════════════════════════════ -->
-<div id="s-result" class="screen">
-  <div class="result-wrap">
-    <div class="result-emoji" id="res-emoji"></div>
-    <div class="result-title" id="res-title"></div>
-    <div class="result-sub" id="res-sub"></div>
-    <div class="role-reveal-list" id="res-roles"></div>
-    <button class="btn btn-outline" onclick="resetGame()">🔄 새 게임 시작</button>
+<!-- ══ PAGE: WIN ══ -->
+<div id="p-win" class="page">
+  <div class="win-wrap">
+    <div class="win-emoji" id="win-emoji"></div>
+    <div class="win-title" id="win-title"></div>
+    <div class="win-sub" id="win-sub"></div>
+    <div class="card" style="width:100%;margin-bottom:24px" id="win-roles"></div>
+    <button class="btn btn-outline" onclick="goLobby()">🔄 처음으로</button>
   </div>
 </div>
 
-<script>
-'use strict';
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get, update, onValue, off, push, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-// ─── CONSTANTS ───────────────────────────────────────────────────────────────
-const ROLE_CFG = {
-  마피아: { color:'#e94560', emoji:'🔪', desc:'밤마다 동료 마피아와 함께 시민 1명을 처형하세요.', dotColor:'var(--mafia)' },
-  의사:   { color:'#27ae60', emoji:'💉', desc:'밤마다 1명을 선택해 마피아의 처형에서 구할 수 있습니다. 자신도 가능.',  dotColor:'var(--doctor)' },
-  경찰:   { color:'#3498db', emoji:'🔵', desc:'밤마다 1명을 선택해 마피아 여부를 비밀리에 조사할 수 있습니다.', dotColor:'var(--police)' },
-  시민:   { color:'#7f8c8d', emoji:'👤', desc:'낮에 토론하여 마피아를 찾아내세요. 투표로 처형합니다.', dotColor:'var(--citizen)' },
+// ── FIREBASE CONFIG ──────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyDJh_KT19dXRrOQzRn26oyJeg0EvxZ0lOs",
+  authDomain: "baefia-8a574.firebaseapp.com",
+  databaseURL: "https://baefia-8a574-default-rtdb.firebaseio.com",
+  projectId: "baefia-8a574",
+  storageBucket: "baefia-8a574.firebasestorage.app",
+  messagingSenderId: "786493145702",
+  appId: "1:786493145702:web:0c434d23cf4b7e03c323a7"
 };
 
-const ROLE_ORDER = ['마피아','의사','경찰','시민'];
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
 
-// ─── STATE ───────────────────────────────────────────────────────────────────
-let G = {};
+// ── STATE ────────────────────────────────────────────────────────────────────
+let S = {
+  nick: '',
+  roomCode: '',
+  playerId: '',
+  isHost: false,
+  myRole: '',
+  roles: { 마피아:2, 의사:1, 경찰:1, 시민:3 },
+  listeners: [],
+};
 
-function initState() {
-  G = {
-    count: 7,
-    roles: { 마피아:2, 의사:1, 경찰:1, 시민:3 },
-    names: [],
-    players: [],   // {name, role, alive}
-    roleIdx: 0,
-    phase: 0,
-    nightStep: 0,
-    nightChoices: { mafia:null, doctor:null, police:null },      // 0=night1, 1=day1, 2=night2, ...
-    timer: { sec:300, running:false, iv:null },
-  };
-  G.names = makenames(G.count);
-}
+let timer = { sec:300, running:false, iv:null };
 
-function makenames(n) {
-  const arr = [];
-  for (let i = 0; i < n; i++) arr.push((i+1)+'번 플레이어');
-  return arr;
-}
-
-function calcRoles(n) {
-  const mafia = Math.max(1, Math.floor(n/3));
-  const doctor = n >= 4 ? 1 : 0;
-  const police = n >= 5 ? 1 : 0;
-  const citizen = Math.max(0, n - mafia - doctor - police);
-  return { 마피아:mafia, 의사:doctor, 경찰:police, 시민:citizen };
-}
-
-// ─── SCREEN HELPERS ──────────────────────────────────────────────────────────
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+// ── UTILS ────────────────────────────────────────────────────────────────────
+function page(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
 
-// ─── HOLD SOUND ──────────────────────────────────────────────────────────────
-let _holdAudio = null;
-function startHoldSound(){
-  try {
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type='sine'; osc.frequency.value=392;
-    gain.gain.value=0.07;
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start();
-    _holdAudio={ctx,osc};
-  } catch(e){}
+function genCode(){
+  return Math.random().toString(36).slice(2,6).toUpperCase();
+}
+
+function genId(){
+  return Math.random().toString(36).slice(2,10);
+}
+
+function esc(s){ return String(s).replace(/</g,'&lt;'); }
+
+function clearListeners(){
+  S.listeners.forEach(fn=>fn());
+  S.listeners=[];
+}
+
+function listen(r, cb){
+  onValue(r, cb);
+  S.listeners.push(()=>off(r, 'value', cb));
+}
+
+// ── HOLD BUTTON ──────────────────────────────────────────────────────────────
+let _audio=null;
+function startSound(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.value=392;g.gain.value=0.06;
+    o.connect(g);g.connect(ctx.destination);o.start();
+    _audio={ctx,o};
+  }catch(e){}
   if(navigator.vibrate) navigator.vibrate([40,30,40]);
 }
-function stopHoldSound(){
-  if(_holdAudio){ try{ _holdAudio.osc.stop(); _holdAudio.ctx.close(); }catch(e){} _holdAudio=null; }
+function stopSound(){
+  if(_audio){try{_audio.o.stop();_audio.ctx.close();}catch(e){}_audio=null;}
 }
 
-// Hold-to-reveal utility
-function holdBtn(el, onDown, onUp, delay=600) {
-  let timer = null;
-  function dn(e){
-    e.preventDefault();
-    el.classList.add('on');
-    startHoldSound();
-    timer = setTimeout(()=>{ onDown(); }, delay);
-  }
-  function up(e){
-    e.preventDefault();
-    el.classList.remove('on');
-    clearTimeout(timer);
-    stopHoldSound();
-    onUp();
-  }
-  el.addEventListener('mousedown', dn);
-  el.addEventListener('touchstart', dn, {passive:false});
-  el.addEventListener('mouseup', up);
-  el.addEventListener('mouseleave', up);
-  el.addEventListener('touchend', up);
-  el.addEventListener('touchcancel', up);
+function holdBtn(el, onDown, onUp, delay=600){
+  let t=null;
+  function dn(e){e.preventDefault();el.classList.add('on');startSound();t=setTimeout(onDown,delay);}
+  function up(e){e.preventDefault();el.classList.remove('on');clearTimeout(t);stopSound();onUp();}
+  el.addEventListener('mousedown',dn);
+  el.addEventListener('touchstart',dn,{passive:false});
+  el.addEventListener('mouseup',up);
+  el.addEventListener('mouseleave',up);
+  el.addEventListener('touchend',up);
+  el.addEventListener('touchcancel',up);
 }
 
-// ─── SETUP SCREEN ────────────────────────────────────────────────────────────
-function renderSetup() {
-  document.getElementById('cnt-disp').textContent = G.count;
+// ── ROLE CONFIG ──────────────────────────────────────────────────────────────
+const ROLE_CFG = {
+  마피아:{color:'#e94560',emoji:'🔪',desc:'밤마다 동료와 처형할 사람을 선택하세요.'},
+  의사:  {color:'#27ae60',emoji:'💉',desc:'밤마다 1명을 선택해 처형에서 구할 수 있습니다.'},
+  경찰:  {color:'#3498db',emoji:'🔵',desc:'밤마다 1명을 조사해 마피아 여부를 확인합니다.'},
+  시민:  {color:'#7f8c8d',emoji:'👤',desc:'낮 토론으로 마피아를 찾아 투표로 처형하세요.'},
+};
 
-  // Role grid
-  const grid = document.getElementById('role-grid');
-  grid.innerHTML = '';
-  ROLE_ORDER.forEach(role => {
-    const cfg = ROLE_CFG[role];
-    const cell = document.createElement('div');
-    cell.className = 'role-cell';
-    cell.innerHTML = `
+function calcDefaultRoles(n){
+  const mafia=Math.max(1,Math.floor(n/3));
+  const doctor=n>=4?1:0;
+  const police=n>=5?1:0;
+  return {마피아:mafia,의사:doctor,경찰:police,시민:Math.max(0,n-mafia-doctor-police)};
+}
+
+// ── LOBBY ────────────────────────────────────────────────────────────────────
+function lobbyMsg(m,err=false){
+  const el=document.getElementById('lobby-msg');
+  el.textContent=m;
+  el.style.color=err?'var(--accent)':'var(--success)';
+}
+
+document.getElementById('btn-create').addEventListener('click',async()=>{
+  const nick=document.getElementById('inp-nick').value.trim();
+  if(!nick){lobbyMsg('닉네임을 입력하세요',true);return;}
+  S.nick=nick;
+  S.isHost=true;
+  S.playerId=genId();
+  S.roomCode=genCode();
+
+  await set(ref(db,`rooms/${S.roomCode}`),{
+    host: S.playerId,
+    status: 'waiting',
+    roles: S.roles,
+    players:{ [S.playerId]:{ nick, host:true, ready:false, alive:true, order:Date.now() } }
+  });
+
+  enterWaitRoom();
+});
+
+document.getElementById('btn-join').addEventListener('click',async()=>{
+  const nick=document.getElementById('inp-nick').value.trim();
+  const code=document.getElementById('inp-code').value.trim().toUpperCase();
+  if(!nick){lobbyMsg('닉네임을 입력하세요',true);return;}
+  if(code.length!==4){lobbyMsg('4자리 코드를 입력하세요',true);return;}
+
+  const snap=await get(ref(db,`rooms/${code}`));
+  if(!snap.exists()){lobbyMsg('존재하지 않는 방입니다',true);return;}
+  const room=snap.val();
+  if(room.status!=='waiting'){lobbyMsg('이미 시작된 게임입니다',true);return;}
+
+  S.nick=nick;
+  S.isHost=false;
+  S.playerId=genId();
+  S.roomCode=code;
+  S.roles=room.roles||S.roles;
+
+  await set(ref(db,`rooms/${code}/players/${S.playerId}`),{
+    nick, host:false, ready:false, alive:true, order:Date.now()
+  });
+
+  enterWaitRoom();
+});
+
+// ── WAIT ROOM ────────────────────────────────────────────────────────────────
+function enterWaitRoom(){
+  page('p-wait');
+  document.getElementById('wait-code').textContent=S.roomCode;
+  document.getElementById('host-settings').style.display=S.isHost?'':'none';
+  document.getElementById('guest-waiting').style.display=S.isHost?'none':'';
+
+  if(S.isHost) renderHostRoleGrid();
+
+  // Listen for player changes
+  listen(ref(db,`rooms/${S.roomCode}/players`), snap=>{
+    if(!snap.exists()) return;
+    const players=snap.val();
+    renderWaitPlayers(players);
+
+    if(S.isHost){
+      const n=Object.keys(players).length;
+      S.roles=calcDefaultRoles(n);
+      renderHostRoleGrid();
+    }
+  });
+
+  // Listen for game start
+  listen(ref(db,`rooms/${S.roomCode}/status`), snap=>{
+    if(snap.val()==='started') enterRoleReveal();
+  });
+
+  // Cleanup on exit
+  window.addEventListener('beforeunload',()=>{
+    remove(ref(db,`rooms/${S.roomCode}/players/${S.playerId}`));
+  });
+}
+
+function renderWaitPlayers(players){
+  const sorted=Object.entries(players).sort((a,b)=>a[1].order-b[1].order);
+  document.getElementById('wait-count').textContent=sorted.length;
+
+  const colors=['#e94560','#3498db','#27ae60','#f39c12','#9b59b6','#1abc9c','#e67e22','#e74c3c','#2ecc71','#3498db'];
+  const list=document.getElementById('wait-players');
+  list.innerHTML='';
+  sorted.forEach(([id,p],i)=>{
+    const el=document.createElement('div');
+    el.className='player-item';
+    el.innerHTML=`
+      <div class="player-avatar" style="background:${colors[i%colors.length]}22;color:${colors[i%colors.length]}">${esc(p.nick[0])}</div>
+      <span class="player-name">${esc(p.nick)}</span>
+      ${p.host?'<span class="badge host-badge">방장</span>':''}
+      ${id===S.playerId?'<span class="badge" style="background:#ffffff11;color:var(--dim)">나</span>':''}
+    `;
+    list.appendChild(el);
+  });
+}
+
+function renderHostRoleGrid(){
+  const total=Object.values(S.roles).reduce((a,b)=>a+b,0);
+  const grid=document.getElementById('host-role-grid');
+  grid.innerHTML='';
+  const roleOrder=['마피아','의사','경찰','시민'];
+  roleOrder.forEach(role=>{
+    const cfg=ROLE_CFG[role];
+    const el=document.createElement('div');
+    el.className='role-cell';
+    el.innerHTML=`
       <div class="role-cell-lbl">
         <span class="dot" style="background:${cfg.color}"></span>
         <span>${cfg.emoji} ${role}</span>
       </div>
       <div class="role-adj">
         <button class="adj-btn" data-role="${role}" data-d="-1">−</button>
-        <span class="adj-num" id="rn-${role}">${G.roles[role]}</span>
+        <span class="adj-num" id="rn-${role}">${S.roles[role]||0}</span>
         <button class="adj-btn" data-role="${role}" data-d="1">＋</button>
       </div>
     `;
-    grid.appendChild(cell);
+    grid.appendChild(el);
   });
 
-  updateRoleMsg();
-  renderNameList();
+  const snap=document.getElementById('wait-count');
+  const n=parseInt(snap.textContent)||0;
+  const diff=total-n;
+  const msg=document.getElementById('host-role-msg');
+  if(diff===0){msg.style.color='var(--success)';msg.textContent=`✅ 합계 ${total}명 일치`;}
+  else{msg.style.color='var(--accent)';msg.textContent=`⚠️ 합계 ${total}명 / 참가자 ${n}명 (${Math.abs(diff)}명 ${diff>0?'초과':'부족'})`;}
 }
 
-function updateRoleMsg() {
-  const total = Object.values(G.roles).reduce((a,b)=>a+b,0);
-  const diff = total - G.count;
-  const el = document.getElementById('role-total-msg');
-  if(diff===0){
-    el.style.color='var(--success)';
-    el.textContent=`✅ 역할 합계 ${total}명 — 인원수와 일치`;
-  } else {
-    el.style.color='var(--accent)';
-    el.textContent=`⚠️ 역할 합계 ${total}명 — ${Math.abs(diff)}명 ${diff>0?'초과':'부족'} (인원: ${G.count}명)`;
-  }
-}
-
-function renderNameList() {
-  const list = document.getElementById('plist');
-  list.innerHTML='';
-  for(let i=0;i<G.count;i++){
-    const row = document.createElement('div');
-    row.className='prow';
-    row.innerHTML=`
-      <span class="prow-lbl">${i+1}</span>
-      <input class="pname-inp" type="text" value="${esc(G.names[i])}" data-i="${i}">
-    `;
-    const inp = row.querySelector('input');
-    inp.addEventListener('input', e => { G.names[+e.target.dataset.i] = e.target.value; });
-    inp.addEventListener('mousedown', e=>e.stopPropagation());
-    inp.addEventListener('touchstart', e=>e.stopPropagation(), {passive:false});
-    list.appendChild(row);
-  }
-}
-
-function esc(s){ return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-document.getElementById('btn-minus').addEventListener('click', ()=>{
-  if(G.count<=2) return;
-  G.count--;
-  Object.assign(G.roles, calcRoles(G.count));
-  while(G.names.length > G.count) G.names.pop();
-  renderSetup();
-});
-
-document.getElementById('btn-plus').addEventListener('click', ()=>{
-  G.count++;
-  Object.assign(G.roles, calcRoles(G.count));
-  while(G.names.length < G.count) G.names.push(G.names.length+1+'번 플레이어');
-  renderSetup();
-});
-
-document.getElementById('role-grid').addEventListener('click', e=>{
-  const btn = e.target.closest('[data-role]');
+document.getElementById('host-role-grid').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-role]');
   if(!btn) return;
-  const role = btn.dataset.role;
-  const d = +btn.dataset.d;
-  const next = (G.roles[role]||0) + d;
-  if(next < 0) return;
-  G.roles[role] = next;
-  document.getElementById('rn-'+role).textContent = next;
-  updateRoleMsg();
+  const role=btn.dataset.role;
+  const next=(S.roles[role]||0)+Number(btn.dataset.d);
+  if(next<0) return;
+  S.roles[role]=next;
+  renderHostRoleGrid();
+  update(ref(db,`rooms/${S.roomCode}`),{roles:S.roles});
 });
 
-document.getElementById('btn-start').addEventListener('click', ()=>{
-  // sync names from inputs
-  document.querySelectorAll('.pname-inp').forEach(inp=>{
-    G.names[+inp.dataset.i] = inp.value.trim() || (Number(inp.dataset.i)+1)+'번 플레이어';
+document.getElementById('btn-game-start').addEventListener('click',async()=>{
+  const snap=await get(ref(db,`rooms/${S.roomCode}/players`));
+  if(!snap.exists()) return;
+  const players=snap.val();
+  const n=Object.keys(players).length;
+  const total=Object.values(S.roles).reduce((a,b)=>a+b,0);
+  if(total!==n){alert(`역할 합계(${total})가 인원수(${n})와 맞지 않습니다.`);return;}
+
+  // Shuffle & assign roles
+  let roleArr=[];
+  Object.entries(S.roles).forEach(([role,cnt])=>{for(let i=0;i<cnt;i++) roleArr.push(role);});
+  for(let i=roleArr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[roleArr[i],roleArr[j]]=[roleArr[j],roleArr[i]];}
+
+  const sorted=Object.keys(players).sort((a,b)=>players[a].order-players[b].order);
+  const updates={};
+  sorted.forEach((id,i)=>{updates[`rooms/${S.roomCode}/players/${id}/role`]=roleArr[i];});
+  updates[`rooms/${S.roomCode}/status`]='started';
+  updates[`rooms/${S.roomCode}/phase`]='day';
+  updates[`rooms/${S.roomCode}/round`]=1;
+  updates[`rooms/${S.roomCode}/nightResult`]=null;
+  updates[`rooms/${S.roomCode}/nightActions`]=null;
+  updates[`rooms/${S.roomCode}/votes`]=null;
+  await update(ref(db),updates);
+});
+
+// ── ROLE REVEAL ───────────────────────────────────────────────────────────────
+async function enterRoleReveal(){
+  clearListeners();
+  const snap=await get(ref(db,`rooms/${S.roomCode}/players/${S.playerId}/role`));
+  S.myRole=snap.val()||'시민';
+
+  page('p-role');
+  document.getElementById('role-nick').textContent=`${S.nick}님의 역할`;
+
+  // Hold to reveal
+  const box=document.getElementById('role-reveal-box');
+  function showRole(){
+    const cfg=ROLE_CFG[S.myRole];
+    box.style.borderColor=cfg.color;
+    let extra='';
+    // 마피아면 동료 표시
+    if(S.myRole==='마피아'){
+      get(ref(db,`rooms/${S.roomCode}/players`)).then(ps=>{
+        if(!ps.exists()) return;
+        const others=Object.entries(ps.val())
+          .filter(([id,p])=>id!==S.playerId&&p.role==='마피아')
+          .map(([,p])=>p.nick);
+        const teamText=others.length>0?`동료 마피아: <strong style="color:#e94560">${others.map(esc).join(', ')}</strong>`:'당신만 마피아입니다';
+        box.innerHTML=`
+          <div style="font-size:50px">${cfg.emoji}</div>
+          <div class="reveal-role" style="color:${cfg.color}">${S.myRole}</div>
+          <div class="reveal-desc">${cfg.desc}</div>
+          <div style="margin-top:10px;font-size:13px;color:#e94560">${teamText}</div>`;
+      });
+    } else {
+      box.innerHTML=`
+        <div style="font-size:50px">${cfg.emoji}</div>
+        <div class="reveal-role" style="color:${cfg.color}">${S.myRole}</div>
+        <div class="reveal-desc">${cfg.desc}</div>`;
+    }
+  }
+  function hideRole(){
+    box.style.borderColor='';
+    box.innerHTML=`<div style="font-size:48px">🤫</div><div class="dim" style="font-size:13px;line-height:1.8">아래 버튼을 <strong style="color:var(--text)">꾹 누르는 동안만</strong><br>역할이 표시됩니다</div>`;
+  }
+
+  const holdEl=document.getElementById('role-hold-btn');
+  // re-wire
+  const newHold=holdEl.cloneNode(true);
+  holdEl.parentNode.replaceChild(newHold,holdEl);
+  holdBtn(newHold, showRole, hideRole);
+
+  document.getElementById('btn-role-ready').addEventListener('click',async()=>{
+    await update(ref(db,`rooms/${S.roomCode}/players/${S.playerId}`),{ready:true});
+    document.getElementById('btn-role-ready').disabled=true;
+    document.getElementById('btn-role-ready').textContent='✅ 준비 완료';
+    updateReadyStatus();
   });
-  const total = Object.values(G.roles).reduce((a,b)=>a+b,0);
-  if(total !== G.count){
-    alert(`역할 합계(${total}명)가 인원수(${G.count}명)와 다릅니다.\n조정 후 다시 시작해주세요.`);
+
+  // Watch ready status
+  listen(ref(db,`rooms/${S.roomCode}/players`),snap=>{
+    if(!snap.exists()) return;
+    const players=snap.val();
+    const total=Object.keys(players).length;
+    const ready=Object.values(players).filter(p=>p.ready).length;
+    document.getElementById('role-ready-status').textContent=`${ready}/${total}명 준비 완료`;
+    if(ready===total) enterGame();
+  });
+}
+
+function updateReadyStatus(){
+  get(ref(db,`rooms/${S.roomCode}/players`)).then(snap=>{
+    if(!snap.exists()) return;
+    const players=snap.val();
+    const total=Object.keys(players).length;
+    const ready=Object.values(players).filter(p=>p.ready).length;
+    document.getElementById('role-ready-status').textContent=`${ready}/${total}명 준비 완료`;
+  });
+}
+
+// ── GAME ──────────────────────────────────────────────────────────────────────
+let gameListeners=[];
+
+function clearGameListeners(){
+  gameListeners.forEach(fn=>fn());
+  gameListeners=[];
+}
+
+function gameListen(r,cb){
+  onValue(r,cb);
+  gameListeners.push(()=>off(r,'value',cb));
+}
+
+async function enterGame(){
+  clearListeners();
+  page('p-game');
+  timerReset();
+
+  // Listen to game state
+  gameListen(ref(db,`rooms/${S.roomCode}`), snap=>{
+    if(!snap.exists()) return;
+    const room=snap.val();
+    if(room.status==='ended'){ showWin(room); return; }
+    renderGameState(room);
+  });
+}
+
+async function renderGameState(room){
+  const phase=room.phase||'day';
+  const round=room.round||1;
+
+  const icon=document.getElementById('g-phase-icon');
+  const lbl=document.getElementById('g-phase-lbl');
+  const roundLbl=document.getElementById('g-round-lbl');
+  icon.textContent=phase==='night'?'🌙':'☀️';
+  lbl.textContent=phase==='night'?'밤':'낮';
+  lbl.className='phase-lbl '+(phase==='night'?'night-clr':'day-clr');
+  roundLbl.textContent=`${round}번째`;
+
+  if(phase==='night'){
+    document.getElementById('g-night').style.display='';
+    document.getElementById('g-day').style.display='none';
+    renderNightUI(room);
+  } else {
+    document.getElementById('g-night').style.display='none';
+    document.getElementById('g-day').style.display='';
+    renderDayUI(room);
+  }
+}
+
+// ── NIGHT UI ─────────────────────────────────────────────────────────────────
+function renderNightUI(room){
+  const players=room.players||{};
+  const actions=room.nightActions||{};
+  const myAction=actions[S.playerId];
+  const guide=document.getElementById('g-night-guide');
+  const action=document.getElementById('g-night-action');
+
+  // 이미 행동했으면
+  if(myAction!==undefined){
+    guide.innerHTML=`<strong>${ROLE_CFG[S.myRole]?.emoji||''} 행동 완료</strong><br><br>다른 플레이어들의 행동을 기다리는 중입니다.`;
+    action.innerHTML=`<div class="result-box" style="color:var(--success)">✅ 행동 완료 — 낮이 되길 기다리세요</div>`;
+
+    // 방장: 모두 행동했는지 확인 후 낮으로
+    if(S.isHost) checkNightDone(room);
     return;
   }
-  if(G.roles['마피아'] < 1){ alert('마피아가 최소 1명 필요합니다.'); return; }
-  startGame();
-});
 
-// ─── GAME START ──────────────────────────────────────────────────────────────
-function shuffle(arr){
-  const a=[...arr];
-  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
-  return a;
-}
+  const alivePlayers=Object.entries(players).filter(([,p])=>p.alive);
 
-function startGame(){
-  let roles=[];
-  ROLE_ORDER.forEach(r=>{ for(let i=0;i<(G.roles[r]||0);i++) roles.push(r); });
-  roles = shuffle(roles);
-  G.players = roles.map((role,i)=>({ name:G.names[i]||(i+1)+'번 플레이어', role, alive:true }));
-  G.roleIdx = 0;
-  G.phase = 0;
-  timerReset();
-  showRoleScreen();
-}
-
-// ─── ROLE DISTRIBUTION ───────────────────────────────────────────────────────
-function showRoleScreen(){
-  show('s-role');
-  renderRoleStep();
-}
-
-function renderRoleStep(){
-  const i = G.roleIdx;
-  const p = G.players[i];
-  document.getElementById('role-player-lbl').textContent = `${p.name}님, 확인하세요`;
-  document.getElementById('role-progress-lbl').textContent = `${i+1} / ${G.count}`;
-
-  // Dots
-  const dots = document.getElementById('role-dots');
-  dots.innerHTML='';
-  G.players.forEach((_,j)=>{
-    const d = document.createElement('div');
-    d.style.cssText = `width:8px;height:8px;border-radius:50%;background:${j<i?'var(--success)':j===i?'var(--accent)':'var(--border)'}`;
-    dots.appendChild(d);
-  });
-
-  // Reset reveal card
-  resetRevealCard();
-
-  // Next button label
-  document.getElementById('btn-role-next').textContent =
-    i < G.count-1
-      ? `✅ 확인 완료 — ${G.players[i+1].name}으로`
-      : '✅ 모두 확인 완료 — 게임 시작!';
-}
-
-function resetRevealCard(){
-  const card = document.getElementById('reveal-card');
-  card.style.borderColor='';
-  card.innerHTML=`
-    <div style="font-size:50px">🤫</div>
-    <div class="dim" style="text-align:center;font-size:13px;line-height:1.8">
-      아래 버튼을 <strong style="color:var(--text)">꾹 누르는 동안만</strong><br>역할이 표시됩니다
-    </div>
-  `;
-}
-
-// Role hold button — clone to remove old listeners
-(function(){
-  const wrap = document.getElementById('role-hold-btn').parentNode;
-  const orig = document.getElementById('role-hold-btn');
-  orig.id=''; // detach id temporarily so we can recreate
-  orig.remove();
-  const btn = document.createElement('button');
-  btn.id='role-hold-btn';
-  btn.className='hold-btn';
-  btn.style.marginBottom='12px';
-  btn.textContent='👆 꾹 눌러서 역할 확인';
-  wrap.insertBefore(btn, document.getElementById('btn-role-next'));
-
-  holdBtn(btn,
-    ()=>{
-      const p = G.players[G.roleIdx];
-      const cfg = ROLE_CFG[p.role];
-      const card = document.getElementById('reveal-card');
-      card.style.borderColor = cfg.color;
-      let extra = '';
-      if(p.role==='마피아'){
-        const teammates = G.players
-          .map((x,i)=>({...x,num:i+1}))
-          .filter((_,i)=>i!==G.roleIdx && G.players[i].role==='마피아');
-        extra = teammates.length>0
-          ? `<div style="margin-top:10px;font-size:13px;color:var(--mafia);font-weight:700">동료 마피아: ${teammates.map(t=>t.name).join(', ')}</div>`
-          : `<div style="margin-top:10px;font-size:13px;color:var(--dim)">당신만 마피아입니다</div>`;
-      }
-      card.innerHTML=`
-        <div style="font-size:52px">${cfg.emoji}</div>
-        <div class="reveal-role" style="color:${cfg.color}">${p.role}</div>
-        <div class="reveal-desc">${cfg.desc}</div>
-        ${extra}
-      `;
-    },
-    ()=>{ resetRevealCard(); }
-  );
-})();
-
-document.getElementById('btn-role-next').addEventListener('click', ()=>{
-  resetRevealCard();
-  G.roleIdx++;
-  if(G.roleIdx >= G.count) startGamePhases();
-  else renderRoleStep();
-});
-
-// ─── GAME PHASES ─────────────────────────────────────────────────────────────
-function startGamePhases(){
-  G.phase = 1; // 역할 확인 시 마피아 동료 공개했으므로 첫 밤 건너뜀
-  G.nightStep = 0;
-  show('s-game');
-  renderPhase();
-}
-
-function buildNightSteps(){
-  const s=[];
-  if((G.roles['마피아']||0)>0) s.push('마피아');
-  if((G.roles['의사']||0)>0)   s.push('의사');
-  if((G.roles['경찰']||0)>0)   s.push('경찰');
-  return s;
-}
-
-function prevPhase(){
-  if(isNight() && roundNum()>1 && G.nightStep>0){
-    G.nightStep--;
-    renderNight(roundNum());
-  } else {
-    G.nightStep=0;
-    if(G.phase>1){ G.phase--; renderPhase(); }
+  if(S.myRole==='시민'){
+    guide.innerHTML=`<strong>👤 시민</strong><br><br>눈을 감고 기다리세요.<br>마피아, 의사, 경찰이 행동하는 중입니다.`;
+    action.innerHTML=`<div class="result-box">👁️ 기다리는 중<span class="waiting-dot">.</span><span class="waiting-dot">.</span><span class="waiting-dot">.</span></div>`;
+    // 시민은 자동으로 행동 완료 처리
+    update(ref(db,`rooms/${S.roomCode}/nightActions/${S.playerId}`), {role:'시민', target:null});
+    if(S.isHost) checkNightDone(room);
+    return;
   }
-}
-function nextPhase(){
-  const steps=buildNightSteps();
-  if(isNight() && roundNum()>1 && G.nightStep<steps.length-1){
-    G.nightStep++;
-    renderNight(roundNum());
-  } else {
-    G.nightStep=0;
-    G.phase++;
-    renderPhase();
-  }
-}
 
-const isNight = ()=> G.phase%2===0;
-const roundNum = ()=> Math.floor(G.phase/2)+1;
+  // 마피아/의사/경찰: 선택 UI
+  const cfg=ROLE_CFG[S.myRole];
+  const actionLabel={마피아:'처형',의사:'보호',경찰:'조사'}[S.myRole];
 
-function renderPhase(){
-  const night = isNight();
-  const round = roundNum();
-  const icon = document.getElementById('phase-icon');
-  const lbl  = document.getElementById('phase-lbl');
-  icon.textContent = night ? '🌙' : '☀️';
-  lbl.textContent  = `${round}번째 ${night?'밤':'낮'}`;
-  lbl.className    = `phase-lbl ${night?'night-clr':'day-clr'}`;
+  guide.innerHTML=`<strong>${cfg.emoji} ${S.myRole} — 행동하세요</strong><br><br>${cfg.desc}<br><br><span style="color:var(--dim);font-size:13px">${actionLabel}할 플레이어를 선택하세요.</span>`;
 
-  document.getElementById('btn-prev').classList.toggle('hidden', G.phase<=1 && G.nightStep===0);
-  document.getElementById('game-scroll').scrollTop=0;
-
-  if(night){ renderNight(round); }
-  else      { renderDay(round); timerReset(); }
-}
-
-
-
-function renderNight(round){
-  document.getElementById('night-wrap').style.display='';
-  document.getElementById('day-wrap').style.display='none';
-
-  // 게임 시작 시 1번째 밤은 건너뛰므로 round===1은 사용 안 함
-  // 2번째 밤~: 마피아→의사→경찰 단계
-  renderNightStep(round);
-}
-
-const NIGHT_ROLE_CFG = {
-  마피아:{ emoji:'🔪', color:'#e94560', label:'처형', guide:'마피아는 스마트폰을 가져가세요.<br>처형할 플레이어를 선택하고 확정하세요.' },
-  의사:  { emoji:'💉', color:'#27ae60', label:'보호', guide:'의사는 스마트폰을 가져가세요.<br>보호할 플레이어를 선택하고 확정하세요.' },
-  경찰:  { emoji:'🔵', color:'#3498db', label:'조사', guide:'경찰은 스마트폰을 가져가세요.<br>조사할 플레이어를 선택하면 마피아 여부를 확인해드립니다.' },
-};
-
-function renderNightStep(round){
-  const steps = buildNightSteps();
-  const role  = steps[G.nightStep];
-  const cfg   = NIGHT_ROLE_CFG[role];
-  const isLast= G.nightStep === steps.length-1;
-
-  const nextBtn = document.getElementById('btn-next');
-  nextBtn.textContent = isLast ? '낮으로 ▶' : `${NIGHT_ROLE_CFG[steps[G.nightStep+1]]?.emoji||''} 다음 차례 ▶`;
-  nextBtn.disabled = true;
-  nextBtn.style.opacity='0.35';
-
-  document.getElementById('night-guide').innerHTML =
-    `<strong>${cfg.emoji} ${role} 차례</strong><br><br>${cfg.guide}`;
-
-  const action = document.getElementById('night-action');
   action.innerHTML='';
+  const grid=document.createElement('div');
+  grid.className='sel-grid';
 
-  // Player grid
-  const grid = document.createElement('div');
-  grid.className='nsel-grid';
+  let selected=null;
+  const resultBox=document.createElement('div');
+  resultBox.className='result-box';
+  resultBox.textContent='플레이어를 선택하세요';
 
-  let selectedIdx = null;
-
-  // Result box (hidden until confirm)
-  const resultBox = document.createElement('div');
-  resultBox.className='night-result-box';
-  resultBox.style.cssText='color:transparent;font-size:15px';
-  resultBox.textContent='선택 후 확정 버튼을 누르세요';
-
-  // Confirm button
-  const confirmBtn = document.createElement('button');
+  const confirmBtn=document.createElement('button');
   confirmBtn.className='confirm-btn';
-  confirmBtn.style.cssText=`background:${cfg.color};color:#fff`;
-  confirmBtn.textContent=`${cfg.emoji} ${cfg.label} 확정`;
+  confirmBtn.style.background=cfg.color;
+  confirmBtn.textContent=`${cfg.emoji} ${actionLabel} 확정`;
   confirmBtn.disabled=true;
 
-  G.players.forEach((p,i)=>{
-    if(!p.alive) return;
+  alivePlayers.forEach(([id,p])=>{
+    if(id===S.playerId && S.myRole!=='의사') return; // 의사만 자기 자신 선택 가능
     const btn=document.createElement('button');
-    btn.className='nsel-btn';
-    btn.textContent=p.name;
+    btn.className='sel-btn';
+    btn.textContent=p.nick;
     btn.addEventListener('click',()=>{
-      grid.querySelectorAll('.nsel-btn').forEach(b=>{
-        b.classList.remove('sel');
+      grid.querySelectorAll('.sel-btn').forEach(b=>{
+        b.classList.remove('picked');
         b.style.background='';
         b.style.borderColor='var(--border)';
         b.style.color='var(--dim)';
       });
-      btn.classList.add('sel');
+      btn.classList.add('picked');
       btn.style.background=cfg.color;
       btn.style.borderColor=cfg.color;
       btn.style.color='#fff';
-      selectedIdx=i;
+      selected=id;
       confirmBtn.disabled=false;
     });
     grid.appendChild(btn);
   });
 
-  confirmBtn.addEventListener('click',()=>{
-    if(selectedIdx===null) return;
-    const p=G.players[selectedIdx];
+  confirmBtn.addEventListener('click',async()=>{
+    if(!selected) return;
+    const p=players[selected];
 
-    // Store choice
-    if(role==='마피아') G.nightChoices.mafia=selectedIdx;
-    else if(role==='의사') G.nightChoices.doctor=selectedIdx;
-    else if(role==='경찰'){
-      G.nightChoices.police=selectedIdx;
+    let resultText=`✅ ${p.nick} ${actionLabel} 확정`;
+    let policeResult=null;
+
+    if(S.myRole==='경찰'){
       const isM=p.role==='마피아';
-      resultBox.style.color=isM?'#e94560':'#3498db';
-      resultBox.textContent=isM
-        ? `${p.name} — 🔴 마피아입니다!`
-        : `${p.name} — ⬜ 시민(무고)입니다`;
-    }
-
-    if(role!=='경찰'){
+      policeResult=isM?'마피아':'시민';
+      resultBox.style.color=isM?'var(--mafia)':'var(--police)';
+      resultBox.textContent=isM?`${p.nick} — 🔴 마피아입니다!`:`${p.nick} — ⬜ 시민(무고)입니다`;
+    } else {
       resultBox.style.color=cfg.color;
-      resultBox.textContent=`✅ ${p.name} ${cfg.label} 확정`;
+      resultBox.textContent=resultText;
     }
 
-    // Lock grid & confirm
-    grid.querySelectorAll('.nsel-btn').forEach(b=>b.disabled=true);
+    grid.querySelectorAll('.sel-btn').forEach(b=>b.disabled=true);
     confirmBtn.disabled=true;
     confirmBtn.textContent='✅ 완료';
 
-    // Enable next
-    nextBtn.disabled=false;
-    nextBtn.style.opacity='1';
+    await update(ref(db,`rooms/${S.roomCode}/nightActions/${S.playerId}`),{
+      role: S.myRole,
+      target: selected,
+      policeResult,
+    });
+
+    if(S.isHost) checkNightDone(room);
   });
 
   action.appendChild(grid);
@@ -755,159 +789,215 @@ function renderNightStep(round){
   action.appendChild(confirmBtn);
 }
 
-function renderDay(round){
-  document.getElementById('night-wrap').style.display='none';
-  document.getElementById('day-wrap').style.display='';
-  document.getElementById('btn-next').textContent='밤으로 ▶';
+async function checkNightDone(room){
+  const snap=await get(ref(db,`rooms/${S.roomCode}`));
+  if(!snap.exists()) return;
+  const r=snap.val();
+  const players=r.players||{};
+  const actions=r.nightActions||{};
+  const alive=Object.keys(players).filter(id=>players[id].alive);
 
-  // ── 밤 결과 발표 ──
-  const rc = document.getElementById('night-result-card');
-  const nc = G.nightChoices;
-  if(round>1 && nc.mafia!==null){
-    const killed = nc.mafia===nc.doctor ? null : nc.mafia;
-    const saved  = nc.mafia===nc.doctor;
+  if(alive.every(id=>actions[id]!==undefined)){
+    // 모두 행동 완료 → 결과 계산
+    const mafiaAction=Object.values(actions).find(a=>a.role==='마피아');
+    const doctorAction=Object.values(actions).find(a=>a.role==='의사');
+    const mafiaTarget=mafiaAction?.target||null;
+    const doctorTarget=doctorAction?.target||null;
 
-    let html='<div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">🌙 어젯밤 결과</div>';
-    if(killed!==null){
-      G.players[killed].alive=false;
-      html+=`<div style="font-size:17px;font-weight:800;color:var(--mafia)">🔪 ${G.players[killed].name}이(가) 처형되었습니다</div>`;
-    } else if(saved){
-      html+=`<div style="font-size:17px;font-weight:800;color:var(--doctor)">💉 의사가 처형 대상을 구했습니다<br><span style="font-size:13px;font-weight:500;color:var(--dim)">아무도 죽지 않았습니다</span></div>`;
+    let killed=null;
+    if(mafiaTarget && mafiaTarget!==doctorTarget) killed=mafiaTarget;
+
+    const updates={};
+    if(killed) updates[`rooms/${S.roomCode}/players/${killed}/alive`]=false;
+    updates[`rooms/${S.roomCode}/nightResult`]={ killed, saved: mafiaTarget===doctorTarget && !!mafiaTarget };
+    updates[`rooms/${S.roomCode}/nightActions`]=null;
+    updates[`rooms/${S.roomCode}/votes`]=null;
+    updates[`rooms/${S.roomCode}/phase`]='day';
+    updates[`rooms/${S.roomCode}/round`]=(r.round||1)+1;
+    await update(ref(db),updates);
+  }
+}
+
+// ── DAY UI ────────────────────────────────────────────────────────────────────
+function renderDayUI(room){
+  const players=room.players||{};
+  const votes=room.votes||{};
+  const nightResult=room.nightResult;
+
+  // 밤 결과 발표
+  const resultEl=document.getElementById('g-night-result');
+  if(nightResult && room.round>2){
+    resultEl.style.display='';
+    if(nightResult.killed){
+      const victim=players[nightResult.killed];
+      resultEl.innerHTML=`<div class="result-announce kill"><div style="font-size:13px;color:var(--dim);margin-bottom:6px">🌙 어젯밤 결과</div><div style="font-size:17px;font-weight:800;color:var(--mafia)">🔪 ${esc(victim?.nick||'?')}이(가) 처형되었습니다</div></div>`;
+    } else if(nightResult.saved){
+      resultEl.innerHTML=`<div class="result-announce save"><div style="font-size:13px;color:var(--dim);margin-bottom:6px">🌙 어젯밤 결과</div><div style="font-size:17px;font-weight:800;color:var(--doctor)">💉 의사가 처형 대상을 구했습니다<br><span style="font-size:13px;font-weight:500">아무도 죽지 않았습니다</span></div></div>`;
     } else {
-      html+=`<div style="font-size:17px;font-weight:800;color:var(--dim)">아무도 처형되지 않았습니다</div>`;
+      resultEl.innerHTML=`<div class="result-announce none"><div style="font-size:13px;color:var(--dim);margin-bottom:6px">🌙 어젯밤 결과</div><div style="font-size:17px;font-weight:800">아무도 죽지 않았습니다</div></div>`;
     }
-    rc.innerHTML=html;
-    rc.style.display='';
-    rc.style.borderColor=killed!==null?'var(--mafia)':'var(--doctor)';
-
-    // 다음 밤을 위해 선택 초기화
-    G.nightChoices={mafia:null,doctor:null,police:null};
   } else {
-    rc.style.display='none';
+    resultEl.style.display='none';
   }
 
-  document.getElementById('day-guide').innerHTML=`
-    <strong>${round}번째 낮 — 토론 시간</strong><br><br>
-    모두 눈을 뜨세요. 자유롭게 토론 후 투표로 처형 여부를 결정하세요.<br><br>
-    <span style="color:var(--dim);font-size:13px">탈락자는 아래 명단에서 체크를 해제하세요.</span>
-  `;
+  // 생존자
+  const alive=Object.entries(players).filter(([,p])=>p.alive);
+  const dead=Object.entries(players).filter(([,p])=>!p.alive);
 
-  renderSurvivorList();
-  checkWin();
-}
+  // 승패 체크 (방장)
+  if(S.isHost){
+    const aliveMafia=alive.filter(([,p])=>p.role==='마피아').length;
+    const aliveCivil=alive.filter(([,p])=>p.role!=='마피아').length;
+    if(aliveMafia===0) endGame(room,'citizen');
+    else if(aliveMafia>=aliveCivil) endGame(room,'mafia');
+  }
 
-function renderSurvivorList(){
-  const list = document.getElementById('sv-list');
-  list.innerHTML='';
-  G.players.forEach((p,i)=>{
-    const row = document.createElement('div');
-    row.className='sv-item'+(p.alive?'':' dead');
-    row.innerHTML=`
-      <div class="sv-chk${p.alive?' on':''}" data-i="${i}">${p.alive?'✓':''}</div>
-      <div>
-        <div class="sv-name">${esc(p.name)}</div>
-        <div class="sv-num">${i+1}번 플레이어</div>
-      </div>
-    `;
-    row.querySelector('.sv-chk').addEventListener('click', ()=>{
-      G.players[i].alive = !G.players[i].alive;
-      renderSurvivorList();
-      checkWin();
+  // 투표 UI
+  const voteGrid=document.getElementById('vote-grid');
+  voteGrid.innerHTML='';
+  const myVote=votes[S.playerId];
+  const me=players[S.playerId];
+
+  alive.forEach(([id,p])=>{
+    if(id===S.playerId) return; // 자기 자신 제외
+    const voteCount=Object.values(votes).filter(v=>v===id).length;
+    const btn=document.createElement('button');
+    btn.className='vote-btn'+(myVote===id?' my-vote':'');
+    btn.innerHTML=`${esc(p.nick)}<span class="vote-count">${voteCount}표</span>`;
+    if(!me?.alive){ btn.disabled=true; }
+    btn.addEventListener('click',async()=>{
+      if(!me?.alive) return;
+      if(myVote===id){
+        // 취소
+        await remove(ref(db,`rooms/${S.roomCode}/votes/${S.playerId}`));
+      } else {
+        await set(ref(db,`rooms/${S.roomCode}/votes/${S.playerId}`),id);
+      }
     });
-    list.appendChild(row);
+    voteGrid.appendChild(btn);
   });
+
+  const totalVoters=alive.filter(([id])=>id!==S.playerId).length;
+  const voteCount=Object.keys(votes).length;
+  document.getElementById('vote-status').textContent=`${voteCount}명 투표 완료`;
+
+  // 생존자 목록
+  const svList=document.getElementById('sv-list');
+  svList.innerHTML='';
+  [...alive,...dead].forEach(([id,p])=>{
+    const el=document.createElement('div');
+    el.className='sv-item'+(p.alive?'':' dead');
+    el.innerHTML=`
+      <span class="sv-name">${esc(p.nick)}${id===S.playerId?' <span style="color:var(--dim);font-size:12px">(나)</span>':''}</span>
+      ${!p.alive?'<span class="badge" style="background:#ffffff10;color:var(--dim)">탈락</span>':''}
+    `;
+    svList.appendChild(el);
+  });
+
+  // 방장: 밤으로 넘기기 버튼 (기존 vote-card 아래)
+  let nightBtn=document.getElementById('btn-goto-night');
+  if(!nightBtn && S.isHost){
+    nightBtn=document.createElement('button');
+    nightBtn.id='btn-goto-night';
+    nightBtn.className='btn btn-ghost';
+    nightBtn.style.marginTop='8px';
+    nightBtn.textContent='🌙 밤으로 넘어가기';
+    nightBtn.addEventListener('click',async()=>{
+      await update(ref(db,`rooms/${S.roomCode}`),{phase:'night',nightResult:null,votes:null});
+    });
+    document.getElementById('g-day').appendChild(nightBtn);
+  }
 }
 
-function checkWin(){
-  const alive   = G.players.filter(p=>p.alive);
-  const mafiaA  = alive.filter(p=>p.role==='마피아').length;
-  const civilA  = alive.filter(p=>p.role!=='마피아').length;
-  if(mafiaA===0)          showResult('citizen');
-  else if(mafiaA>=civilA) showResult('mafia');
+// ── TIMER ────────────────────────────────────────────────────────────────────
+function timerToggle(){ timer.running?timerStop():timerStart(); }
+function timerStart(){
+  if(timer.sec<=0) timerReset();
+  timer.running=true;
+  const btn=document.getElementById('t-start-btn');
+  if(btn){btn.textContent='정지';btn.className='t-btn t-stop';}
+  timer.iv=setInterval(()=>{
+    timer.sec--;updateTimerDisp();
+    if(timer.sec<=0){timerStop();document.getElementById('t-disp').textContent='⏰ 종료!';}
+  },1000);
+}
+function timerStop(){
+  timer.running=false;clearInterval(timer.iv);
+  const btn=document.getElementById('t-start-btn');
+  if(btn){btn.textContent='시작';btn.className='t-btn t-start';}
+}
+function timerReset(){
+  timerStop();timer.sec=300;updateTimerDisp();
+}
+function updateTimerDisp(){
+  const el=document.getElementById('t-disp');if(!el)return;
+  const m=Math.floor(timer.sec/60),s=timer.sec%60;
+  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className='t-disp'+(timer.running?(timer.sec<=30?' t-urgent':' t-running'):'');
 }
 
-function showResult(winner){
+// ── WIN ───────────────────────────────────────────────────────────────────────
+async function endGame(room,winner){
+  const snap=await get(ref(db,`rooms/${S.roomCode}/status`));
+  if(snap.val()==='ended') return; // 이미 처리됨
+  await update(ref(db,`rooms/${S.roomCode}`),{status:'ended',winner});
+}
+
+function showWin(room){
+  clearGameListeners();
   timerStop();
+  const winner=room.winner;
   if(winner==='citizen'){
-    document.getElementById('res-emoji').textContent='🎉';
-    document.getElementById('res-title').textContent='시민 승리!';
-    document.getElementById('res-title').style.color='var(--success)';
-    document.getElementById('res-sub').textContent='모든 마피아를 처형했습니다. 평화로운 마을을 지켜냈습니다!';
+    document.getElementById('win-emoji').textContent='🎉';
+    document.getElementById('win-title').textContent='시민 승리!';
+    document.getElementById('win-title').style.color='var(--success)';
+    document.getElementById('win-sub').textContent='마피아를 모두 처형했습니다!';
   } else {
-    document.getElementById('res-emoji').textContent='🔪';
-    document.getElementById('res-title').textContent='마피아 승리!';
-    document.getElementById('res-title').style.color='var(--accent)';
-    document.getElementById('res-sub').textContent='마피아가 마을을 장악했습니다. 시민들은 패배했습니다!';
+    document.getElementById('win-emoji').textContent='🔪';
+    document.getElementById('win-title').textContent='마피아 승리!';
+    document.getElementById('win-title').style.color='var(--accent)';
+    document.getElementById('win-sub').textContent='마피아가 마을을 장악했습니다!';
   }
 
-  const rolesDiv = document.getElementById('res-roles');
+  const rolesDiv=document.getElementById('win-roles');
   rolesDiv.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">전체 역할 공개</div>';
-  G.players.forEach(p=>{
-    const cfg = ROLE_CFG[p.role];
-    const el = document.createElement('div');
-    el.className='rr-item';
+  const players=room.players||{};
+  Object.entries(players).sort((a,b)=>a[1].order-b[1].order).forEach(([id,p])=>{
+    const cfg=ROLE_CFG[p.role||'시민'];
+    const el=document.createElement('div');
+    el.className='sv-item'+(p.alive?'':' dead');
     el.innerHTML=`
       <span style="font-size:20px">${cfg.emoji}</span>
-      <span style="flex:1;font-size:14px;font-weight:600;${p.alive?'':'text-decoration:line-through;color:var(--dim)'}">${esc(p.name)}</span>
-      <span style="font-size:12px;font-weight:800;color:${cfg.color};margin-right:6px">${p.role}</span>
-      ${!p.alive?'<span style="font-size:11px;color:var(--dim)">탈락</span>':''}
+      <span class="sv-name">${esc(p.nick)}${id===S.playerId?' (나)':''}</span>
+      <span style="font-size:13px;font-weight:800;color:${cfg.color}">${p.role||'?'}</span>
+      ${!p.alive?'<span class="badge" style="background:#fff1;color:var(--dim)">탈락</span>':''}
     `;
     rolesDiv.appendChild(el);
   });
 
-  show('s-result');
+  page('p-win');
 }
 
-// ─── TIMER ───────────────────────────────────────────────────────────────────
-function timerToggle(){ G.timer.running ? timerStop() : timerStart(); }
-
-function timerStart(){
-  if(G.timer.sec<=0) timerReset();
-  G.timer.running=true;
-  const startBtn = document.getElementById('t-start-btn');
-  if(startBtn){ startBtn.textContent='정지'; startBtn.className='t-btn t-stop'; }
-  G.timer.iv = setInterval(()=>{
-    G.timer.sec--;
-    updateTimerDisplay();
-    if(G.timer.sec<=0){ timerStop(); document.getElementById('t-disp').textContent='⏰ 종료!'; }
-  },1000);
-}
-
-function timerStop(){
-  G.timer.running=false;
-  clearInterval(G.timer.iv);
-  const startBtn = document.getElementById('t-start-btn');
-  if(startBtn){ startBtn.textContent='시작'; startBtn.className='t-btn t-start'; }
-}
-
-function timerReset(){
+// ── GO LOBBY ─────────────────────────────────────────────────────────────────
+window.goLobby=function(){
+  clearListeners();
+  clearGameListeners();
   timerStop();
-  G.timer.sec=300;
-  updateTimerDisplay();
-}
+  S={nick:'',roomCode:'',playerId:'',isHost:false,myRole:'',roles:{마피아:2,의사:1,경찰:1,시민:3},listeners:[]};
+  document.getElementById('inp-nick').value='';
+  document.getElementById('inp-code').value='';
+  page('p-lobby');
+};
 
-function updateTimerDisplay(){
-  const el = document.getElementById('t-disp');
-  if(!el) return;
-  const m = Math.floor(G.timer.sec/60);
-  const s = G.timer.sec%60;
-  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  if(!G.timer.running) el.className='t-display';
-  else if(G.timer.sec<=30) el.className='t-display t-urgent';
-  else el.className='t-display t-running';
-}
+// ── INPUT TOUCH FIX ───────────────────────────────────────────────────────────
+document.querySelectorAll('.inp').forEach(el=>{
+  el.addEventListener('mousedown',e=>e.stopPropagation());
+  el.addEventListener('touchstart',e=>e.stopPropagation(),{passive:false});
+});
 
-// ─── RESET ───────────────────────────────────────────────────────────────────
-function resetGame(){
-  timerStop();
-  initState();
-  renderSetup();
-  show('s-setup');
-}
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
-initState();
-renderSetup();
+// expose timer functions
+window.timerToggle=timerToggle;
+window.timerReset=timerReset;
 </script>
 </body>
 </html>
